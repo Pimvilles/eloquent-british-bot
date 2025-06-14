@@ -2,13 +2,30 @@
 /**
  * Helpers for Speech-to-Text (Web Speech API) & Text-to-Speech (ElevenLabs)
  */
-export function useSpeechToText({ onResult }: { onResult: (text: string) => void }) {
-  let recognition: SpeechRecognition | null = null;
+
+// Add type declarations so TypeScript compiler understands these APIs exist.
+declare global {
+  // Some browsers use webkitSpeechRecognition instead of SpeechRecognition
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+  // SpeechRecognitionEvent isn't always available; fallback to 'any'
+  interface SpeechRecognitionEvent extends Event {
+    results: any;
+  }
+}
+
+export function useSpeechToText({
+  onResult,
+}: {
+  onResult: (text: string) => void;
+}) {
+  let recognition: any = null;
   if ("webkitSpeechRecognition" in window) {
-    const w: any = window;
-    recognition = new w.webkitSpeechRecognition();
+    recognition = new window.webkitSpeechRecognition();
   } else if ("SpeechRecognition" in window) {
-    recognition = new (window as any).SpeechRecognition();
+    recognition = new window.SpeechRecognition();
   }
 
   const start = () => {
@@ -16,7 +33,7 @@ export function useSpeechToText({ onResult }: { onResult: (text: string) => void
       recognition.continuous = false;
       recognition.lang = "en-US";
       recognition.interimResults = false;
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.onresult = (event: any) => {
         const transcript = event.results[0]?.[0]?.transcript;
         if (transcript) onResult(transcript);
       };
@@ -54,7 +71,7 @@ export async function speakWithElevenLabs({
       headers: {
         "xi-api-key": apiKey,
         "Content-Type": "application/json",
-        "accept": "audio/mpeg",
+        accept: "audio/mpeg",
       },
       body: JSON.stringify({
         text,
