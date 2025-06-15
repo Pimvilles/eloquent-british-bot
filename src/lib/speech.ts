@@ -3,29 +3,19 @@
  * Helpers for Speech-to-Text (Web Speech API) & Text-to-Speech (ElevenLabs)
  */
 
-// Add type declarations so TypeScript compiler understands these APIs exist.
-declare global {
-  // Some browsers use webkitSpeechRecognition instead of SpeechRecognition
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-  // SpeechRecognitionEvent isn't always available; fallback to 'any'
-  interface SpeechRecognitionEvent extends Event {
-    results: any;
-  }
-}
-
+// Speech-to-Text Hook (Web Speech API)
 export function useSpeechToText({
   onResult,
 }: {
   onResult: (text: string) => void;
 }) {
+  // Cross-browser: get the correct SpeechRecognition constructor
+  const SpeechRecognitionConstructor =
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
   let recognition: any = null;
-  if ("webkitSpeechRecognition" in window) {
-    recognition = new window.webkitSpeechRecognition();
-  } else if ("SpeechRecognition" in window) {
-    recognition = new window.SpeechRecognition();
+  if (SpeechRecognitionConstructor) {
+    recognition = new SpeechRecognitionConstructor();
   }
 
   const start = () => {
@@ -90,3 +80,4 @@ export async function speakWithElevenLabs({
   };
   audio.play();
 }
+
