@@ -9,6 +9,7 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot") => 
       headers: {
         "Content-Type": "application/json",
       },
+      mode: "no-cors", // This handles CORS issues but won't give response details
       body: JSON.stringify({
         message,
         sender,
@@ -16,7 +17,9 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot") => 
         from: "Melsi Chatbot",
       }),
     });
+    console.log("Webhook request sent successfully");
   } catch (error) {
     console.error("Error sending to webhook:", error);
+    // Don't throw the error to avoid breaking the chat flow
   }
 };
