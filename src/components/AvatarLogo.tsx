@@ -7,9 +7,10 @@ const AvatarLogo = ({ size = 56 }) => (
     alt="AI Bot"
     width={size}
     height={size}
-    className="rounded-full object-cover border-4 border-blue-500 shadow-lg"
+    className="rounded-full object-cover border-4 border-blue-500 shadow-lg animate-blue-glow"
     style={{ background: "#222d3b" }}
   />
 );
 
 export default AvatarLogo;
+
