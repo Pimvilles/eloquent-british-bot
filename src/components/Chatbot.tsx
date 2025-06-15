@@ -72,13 +72,49 @@ const Chatbot = () => {
       ...prev,
       { text: question, sender: "user", time: getNow() },
     ]);
+    
+    // ---- LOCAL GREETING RESPONSE LOGIC ----
+    // basic greetings (expand as needed)
+    const greetings = [
+      "hello",
+      "hi",
+      "hey",
+      "howzit",
+      "good morning",
+      "good afternoon",
+      "good evening",
+      "yebo",
+    ];
+    const cleaned = question.toLowerCase().replace(/[^a-z\s]/g, "");
+
+    if (
+      greetings.some((g) =>
+        cleaned === g ||
+        cleaned.startsWith(g + " ") ||
+        cleaned.endsWith(" " + g) ||
+        cleaned.includes(" " + g + " ")
+      )
+    ) {
+      setIsProcessing(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+          sender: "bot" as const,
+          time: getNow(),
+        },
+      ]);
+      return;
+    }
+    // ---- END LOCAL GREETING LOGIC ----
+
     setIsProcessing(true);
 
     // Run via Zapier MCP SSE streaming
     let botMsg = ""; // response will be streamed
     setMessages((prev) => [
       ...prev,
-      { text: "Ghost is thinking...", sender: "bot", time: getNow() },
+      { text: "Ghost is thinking...", sender: "bot" as const, time: getNow() },
     ]);
     // Remove the loading message later
     const removeThinking = () => {
