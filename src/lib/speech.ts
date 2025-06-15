@@ -1,4 +1,3 @@
-
 /**
  * Helpers for Speech-to-Text (Web Speech API) & Text-to-Speech (ElevenLabs)
  */
@@ -33,6 +32,60 @@ export function useSpeechToText({
   };
 
   return { start, recognition: !!recognition };
+}
+
+// TTS using Web Speech API (Browser-native and free)
+export function speakWithBrowser({
+  text,
+  onStart,
+  onEnd,
+}: {
+  text: string;
+  onStart?: () => void;
+  onEnd?: () => void;
+}) {
+  if (!('speechSynthesis' in window)) {
+    console.error("Browser does not support speech synthesis.");
+    alert("Sorry, your browser doesn't support text-to-speech.");
+    onEnd?.();
+    return;
+  }
+
+  // Cancel any previous speech to prevent overlap
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Try to find a British voice to match the bot's persona
+  const setVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+    const britishVoice = voices.find(voice => voice.lang === 'en-GB');
+    if (britishVoice) {
+      utterance.voice = britishVoice;
+    }
+  };
+
+  // Voices might load asynchronously
+  if (window.speechSynthesis.getVoices().length > 0) {
+    setVoice();
+  } else {
+    window.speechSynthesis.onvoiceschanged = setVoice;
+  }
+
+  utterance.onstart = () => {
+    onStart?.();
+  };
+
+  utterance.onend = () => {
+    onEnd?.();
+  };
+
+  utterance.onerror = (event) => {
+    console.error("SpeechSynthesisUtterance.onerror", event);
+    onEnd?.(); // Ensure state is reset on error
+  };
+
+  window.speechSynthesis.speak(utterance);
 }
 
 // TTS using ElevenLabs API
@@ -80,4 +133,3 @@ export async function speakWithElevenLabs({
   };
   audio.play();
 }
-

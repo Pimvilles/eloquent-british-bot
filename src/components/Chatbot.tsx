@@ -3,7 +3,7 @@ import ChatBubble from "./ChatBubble";
 import MessageInputRow from "./MessageInputRow";
 import AvatarLogo from "./AvatarLogo";
 import BrandFooter from "./BrandFooter";
-import { speakWithElevenLabs } from "@/lib/speech";
+import { speakWithBrowser } from "@/lib/speech";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, MemoryMessage } from "@/lib/memory";
 
@@ -53,8 +53,6 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>(() => loadConversation());
   const [input, setInput] = useState("");
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
-  const [ttsApiKey, setTtsApiKey] = useState<string>("");
-  const [isTTSModal, setIsTTSModal] = useState(false);
   // Tool/stream state
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -164,55 +162,17 @@ const Chatbot = () => {
   }
 
   // Play message as speech
-  async function handlePlayMessage(text: string, idx: number) {
-    if (!ttsApiKey) {
-      setIsTTSModal(true);
-      return;
-    }
+  function handlePlayMessage(text: string, idx: number) {
     setTtsMessageIdx(idx);
-    await speakWithElevenLabs({
+    speakWithBrowser({
       text,
-      apiKey: ttsApiKey,
+      onStart: () => setTtsMessageIdx(idx),
       onEnd: () => setTtsMessageIdx(null),
     });
   }
 
   function handleSpeechToTextResult(txt: string) {
     setInput(txt);
-  }
-
-  // Simple modal for TTS API Key
-  function renderTTSModal() {
-    return (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
-        <div className="bg-[#232937] rounded-2xl px-10 py-7 text-center">
-          <div className="text-lg text-white font-semibold mb-2">Enter your ElevenLabs API Key</div>
-          <input
-            className="mt-3 px-4 py-2 bg-[#181c20] rounded-lg w-full text-white border border-blue-600"
-            type="password"
-            value={ttsApiKey}
-            onChange={e => setTtsApiKey(e.target.value)}
-            placeholder="Paste API Key..."
-          />
-          <div className="flex gap-4 mt-5 mb-1 items-center justify-center">
-            <button
-              className="px-4 py-2 rounded bg-blue-600 text-white font-medium hover:bg-blue-700"
-              onClick={() => setIsTTSModal(false)}
-              disabled={!ttsApiKey}
-            >
-              Save & Close
-            </button>
-            <button
-              className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-800"
-              onClick={() => setIsTTSModal(false)}
-            >
-              Cancel
-            </button>
-          </div>
-          <div className="text-xs text-blue-400 pt-2">Get your key at <a href="https://elevenlabs.io" target="_blank" rel="noopener noreferrer" className="underline">ElevenLabs.io</a></div>
-        </div>
-      </div>
-    );
   }
 
   // Scroll to latest
@@ -273,7 +233,6 @@ const Chatbot = () => {
         </div>
       )}
       <BrandFooter />
-      {isTTSModal && renderTTSModal()}
     </div>
   );
 };
