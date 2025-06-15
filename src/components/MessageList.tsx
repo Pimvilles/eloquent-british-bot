@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect } from "react";
 import ChatBubble from "./ChatBubble";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDarkMode } from "@/hooks/useDarkMode";
 
 interface Message {
@@ -48,28 +49,31 @@ const MessageList: React.FC<MessageListProps> = ({
   };
 
   return (
-    <div
-      className={`flex-1 w-full overflow-y-auto px-12 pt-6 pb-4 transition-colors duration-300`}
-      ref={messageListRef}
-      onScroll={handleScroll}
-      style={{ minHeight: 340 }}
-    >
-      <div className="w-full max-w-5xl mx-auto">
-        {messages.map((msg, i) => (
-          <ChatBubble
-            key={i}
-            isBot={msg.sender === "bot"}
-            text={msg.text}
-            time={msg.time}
-            playing={ttsMessageIdx === i}
-            onPlay={
-              msg.sender === "bot"
-                ? () => onPlayMessage(msg.text, i)
-                : undefined
-            }
-          />
-        ))}
-      </div>
+    <div className="flex-1 w-full transition-colors duration-300" style={{ minHeight: 340 }}>
+      <ScrollArea className="h-full w-full">
+        <div
+          className="px-12 pt-6 pb-4"
+          ref={messageListRef}
+          onScroll={handleScroll}
+        >
+          <div className="w-full max-w-5xl mx-auto">
+            {messages.map((msg, i) => (
+              <ChatBubble
+                key={i}
+                isBot={msg.sender === "bot"}
+                text={msg.text}
+                time={msg.time}
+                playing={ttsMessageIdx === i}
+                onPlay={
+                  msg.sender === "bot"
+                    ? () => onPlayMessage(msg.text, i)
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
