@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import TopBar from "./TopBar";
 import MessageList from "./MessageList";
@@ -19,7 +20,7 @@ const Chatbot = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isDarkMode } = useDarkMode();
   
-  const { messages, isProcessing, sendMessage, handleClearHistory } = useChat();
+  const { messages, isProcessing, sendMessage, handleClearHistory, loadMessageContext } = useChat();
 
   const handleSend = async () => {
     const question = input.trim();
@@ -80,8 +81,9 @@ const Chatbot = () => {
   };
 
   const handleMessageClick = (message: any, index: number) => {
-    // Could implement message jumping or highlighting here
-    console.log('Clicked message:', message, 'at index:', index);
+    loadMessageContext(message, index);
+    setIsSidebarOpen(false);
+    console.log('Loaded conversation up to message:', message, 'at index:', index);
   };
 
   return (

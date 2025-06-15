@@ -71,6 +71,13 @@ export const useChat = () => {
     }]);
   };
 
+  const loadMessageContext = (clickedMessage: Message, messageIndex: number) => {
+    // Load conversation up to the clicked message
+    const conversationUpToMessage = messages.slice(0, messageIndex + 1);
+    setMessages(conversationUpToMessage);
+    saveConversation(conversationUpToMessage);
+  };
+
   const sendMessage = async (question: string) => {
     if (!question.trim()) return;
     
@@ -162,5 +169,6 @@ export const useChat = () => {
     isProcessing,
     sendMessage,
     handleClearHistory,
+    loadMessageContext,
   };
 };
