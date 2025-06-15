@@ -2,7 +2,7 @@
 /* Custom scrollbar styles for MessageList */
 .custom-scrollbar {
   /* WebKit browsers (Chrome, Safari, Edge) */
-  scrollbar-width: 16px;
+  scrollbar-width: thick;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -29,6 +29,11 @@
   background-clip: content-box;
 }
 
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: #1a202c;
+  background-clip: content-box;
+}
+
 /* Dark mode styles */
 .dark .custom-scrollbar::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
@@ -40,6 +45,10 @@
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: #cbd5e0;
 }
 
 /* Firefox */
