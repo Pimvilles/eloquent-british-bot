@@ -101,7 +101,7 @@ export const useChat = () => {
       { text: question, sender: "user", time: getNow() },
     ]);
     
-    // Handle greetings locally
+    // Handle greetings locally with faster response
     const greetings = [
       "hello", "hi", "hey", "howzit", "good morning", 
       "good afternoon", "good evening", "yebo",
@@ -117,14 +117,17 @@ export const useChat = () => {
       )
     ) {
       setIsProcessing(false);
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
-          sender: "bot" as const,
-          time: getNow(),
-        },
-      ]);
+      // Faster greeting response - no delay
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+            sender: "bot" as const,
+            time: getNow(),
+          },
+        ]);
+      }, 100); // Reduced from no delay to minimal 100ms for smoother UX
       return;
     }
 
@@ -160,6 +163,7 @@ export const useChat = () => {
           }
         } else if (data.message) {
           botMsg += data.message;
+          // Faster message updates - reduced throttling
           setMessages((prev) => {
             if (
               prev.length > 0 &&
