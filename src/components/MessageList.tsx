@@ -23,39 +23,36 @@ const MessageList: React.FC<MessageListProps> = ({
   ttsMessageIdx, 
   onPlayMessage 
 }) => {
-  const messageListRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { isDarkMode } = useDarkMode();
   const [shouldAutoScroll, setShouldAutoScroll] = React.useState(true);
 
-  // Only auto-scroll when new messages arrive and user is near bottom
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (messageListRef.current && shouldAutoScroll) {
-      const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      
-      if (isNearBottom) {
-        messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    if (scrollAreaRef.current && shouldAutoScroll) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
     }
   }, [messages.length, shouldAutoScroll]);
 
   // Handle scroll events to detect if user is manually scrolling
-  const handleScroll = () => {
-    if (messageListRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setShouldAutoScroll(isNearBottom);
-    }
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLDivElement;
+    const { scrollTop, scrollHeight, clientHeight } = target;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+    setShouldAutoScroll(isNearBottom);
   };
 
   return (
     <div className="flex-1 w-full transition-colors duration-300" style={{ minHeight: 340 }}>
-      <ScrollArea className="h-full w-full">
-        <div
-          className="px-12 pt-6 pb-4"
-          ref={messageListRef}
-          onScroll={handleScroll}
-        >
+      <ScrollArea 
+        ref={scrollAreaRef}
+        className="h-full w-full"
+        onScrollCapture={handleScroll}
+      >
+        <div className="px-12 pt-6 pb-4">
           <div className="w-full max-w-5xl mx-auto">
             {messages.map((msg, i) => (
               <ChatBubble
