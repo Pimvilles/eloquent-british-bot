@@ -110,7 +110,7 @@ const MessageInputRow: React.FC<Props> = ({
         </div>}
       
       {/* Input row */}
-      <div className="flex items-center gap-3 w-full bg-[#1a1f29] rounded-b-2xl px-[12px] py-[8px]">
+      <div className="flex items-center gap-3 w-full bg-[#1a1f29] rounded-b-2xl px-0 py-[8px] mx-[2px] my-0">
         {/* Files Upload Button */}
         <button title="Upload files or take photo" onClick={handleFileUpload} type="button" className="flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg bg-[#212635] hover:bg-[#2a2f3a] transition py-0 px-0 mx-0 my-0 text-white">
           <Files size={20} />
