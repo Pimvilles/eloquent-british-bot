@@ -22,7 +22,7 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
   const [callDuration, setCallDuration] = useState(0);
   const [isPushToTalk, setIsPushToTalk] = useState(false);
   
-  const { sendMessage } = useChat();
+  const { sendVoiceMessage } = useChat();
   const speechTimeoutRef = useRef<NodeJS.Timeout>();
   const callStartTimeRef = useRef<number>();
   const durationIntervalRef = useRef<NodeJS.Timeout>();
@@ -110,18 +110,16 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
       // Cancel any ongoing speech
       window.speechSynthesis.cancel();
       
-      // Send message to AI and wait for response
-      await sendMessage(text);
+      console.log("[Voice] Processing speech:", text);
       
-      // Get the latest bot response (this is simplified - in a real implementation 
-      // you'd want to listen for the specific response to this message)
-      setTimeout(() => {
-        // This timeout allows the AI response to be processed
-        const lastBotMessage = "Thank you for your message. I'm processing your request now.";
-        
+      // Send message to webhook and get AI response
+      const aiResponse = await sendVoiceMessage(text);
+      
+      if (aiResponse) {
+        console.log("[Voice] Got AI response:", aiResponse);
         setCallState("speaking");
         speakWithBrowser({
-          text: lastBotMessage,
+          text: aiResponse,
           onStart: () => setCallState("speaking"),
           onEnd: () => {
             setCallState("idle");
@@ -131,14 +129,38 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
             }
           },
         });
-      }, 1000);
+      } else {
+        console.log("[Voice] No AI response received");
+        const fallbackResponse = "I'm sorry, I didn't catch that. Could you please repeat?";
+        setCallState("speaking");
+        speakWithBrowser({
+          text: fallbackResponse,
+          onStart: () => setCallState("speaking"),
+          onEnd: () => {
+            setCallState("idle");
+            setCurrentTranscript("");
+            if (!isPushToTalk) {
+              setTimeout(() => startContinuousListening(), 500);
+            }
+          },
+        });
+      }
       
     } catch (error) {
       console.error("Error processing speech:", error);
-      setCallState("idle");
-      if (!isPushToTalk) {
-        setTimeout(() => startContinuousListening(), 500);
-      }
+      const errorResponse = "I'm having trouble processing your request. Please try again.";
+      setCallState("speaking");
+      speakWithBrowser({
+        text: errorResponse,
+        onStart: () => setCallState("speaking"),
+        onEnd: () => {
+          setCallState("idle");
+          setCurrentTranscript("");
+          if (!isPushToTalk) {
+            setTimeout(() => startContinuousListening(), 500);
+          }
+        },
+      });
     }
   };
 

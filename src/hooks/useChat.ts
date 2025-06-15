@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, clearConversation, saveChatToHistory } from "@/lib/memory";
 import { Message } from "@/types/chat";
-import { sendToWebhook } from "@/services/webhookService";
+import { sendToWebhook, sendVoiceMessageToWebhook } from "@/services/webhookService";
 import { getNow, getContext, createInitialMessage } from "@/utils/chatUtils";
 import { SYSTEM_PROMPT, ZAPIER_MCP_SSE } from "@/config/systemPrompt";
 
@@ -36,6 +35,26 @@ export const useChat = () => {
     const conversationUpToMessage = messages.slice(0, messageIndex + 1);
     setMessages(conversationUpToMessage);
     saveConversation(conversationUpToMessage);
+  };
+
+  // New method for voice calls that returns the AI response directly
+  const sendVoiceMessage = async (question: string): Promise<string | null> => {
+    if (!question.trim()) return null;
+    
+    console.log("[Voice] Sending voice message:", question);
+    
+    // Try webhook first for voice messages
+    const webhookResponse = await sendVoiceMessageToWebhook(question);
+    
+    if (webhookResponse) {
+      console.log("[Voice] Got webhook response:", webhookResponse);
+      // Log the bot response to webhook
+      await sendToWebhook(webhookResponse, "bot");
+      return webhookResponse;
+    }
+
+    console.log("[Voice] No webhook response, falling back to default");
+    return "I'm having trouble connecting to my voice processing system right now. Please try again in a moment.";
   };
 
   const sendMessage = async (question: string) => {
@@ -131,6 +150,7 @@ export const useChat = () => {
     messages,
     isProcessing,
     sendMessage,
+    sendVoiceMessage,
     handleClearHistory,
     handleNewChat,
     loadMessageContext,

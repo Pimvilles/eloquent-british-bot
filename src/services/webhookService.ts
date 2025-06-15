@@ -1,5 +1,3 @@
-
-
 const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
 export const sendToWebhook = async (message: string, sender: "user" | "bot"): Promise<string | null> => {
@@ -72,3 +70,50 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot"): Pr
   }
 };
 
+// New function specifically for voice calls that returns the response directly
+export const sendVoiceMessageToWebhook = async (message: string): Promise<string | null> => {
+  try {
+    console.log("Sending voice message to webhook:", { message });
+    
+    const response = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        sender: "user",
+        timestamp: new Date().toISOString(),
+        from: "Melsi Voice Call",
+        isVoiceCall: true,
+      }),
+    });
+    
+    if (response.ok) {
+      const contentType = response.headers.get("content-type");
+      console.log("Voice response content type:", contentType);
+      
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        console.log("Voice webhook JSON response:", data);
+        
+        if (data && data.output) {
+          return data.output;
+        }
+      } else {
+        const textResponse = await response.text();
+        console.log("Voice webhook text response:", textResponse);
+        
+        if (textResponse && textResponse.trim()) {
+          return textResponse.trim();
+        }
+      }
+    }
+    
+    console.log("Voice webhook request sent but no valid response");
+    return null;
+  } catch (error) {
+    console.error("Error sending voice message to webhook:", error);
+    return null;
+  }
+};
