@@ -52,7 +52,7 @@ const MessageList: React.FC<MessageListProps> = ({
         className="h-full w-full"
         onScrollCapture={handleScroll}
       >
-        <div className="px-12 pt-6 pb-4 pr-16">
+        <div className="px-12 pt-6 pb-4 pr-20">
           <div className="w-full max-w-5xl mx-auto">
             {messages.map((msg, i) => (
               <ChatBubble
