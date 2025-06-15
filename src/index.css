@@ -217,12 +217,12 @@
     padding-right: env(safe-area-inset-right, 0px);
   }
   
-  .h-mobile-screen {
+  .h-screen-mobile {
     height: 100vh;
     height: 100dvh;
   }
   
-  .min-h-mobile-screen {
+  .min-h-screen-mobile {
     min-height: 100vh;
     min-height: 100dvh;
   }

@@ -8,7 +8,7 @@ const Index = () => {
   const { isDarkMode } = useDarkMode();
   
   return (
-    <div className={`h-mobile-screen w-full flex flex-col relative transition-colors duration-300 overflow-hidden ${
+    <div className={`h-screen-mobile w-full flex flex-col relative transition-colors duration-300 overflow-hidden ${
       isDarkMode ? "bg-[#161b22]" : "bg-gray-50"
     }`}>
       <MatrixRain />

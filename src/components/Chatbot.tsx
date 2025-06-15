@@ -101,7 +101,7 @@ const Chatbot = () => {
           ? 'bg-[#171c23] text-white' 
           : 'bg-white text-gray-900'
       }`}>
-        {/* Top Bar - Fixed */}
+        {/* Top Bar - Fixed with safe area */}
         <div className="flex-shrink-0 safe-top">
           <TopBar 
             userName={USER_NAME}
@@ -113,8 +113,8 @@ const Chatbot = () => {
           />
         </div>
         
-        {/* Message List - Scrollable */}
-        <div className="flex-1 overflow-hidden">
+        {/* Message List - Scrollable content area */}
+        <div className="flex-1 overflow-hidden min-h-0">
           <MessageList
             messages={messages}
             isProcessing={isProcessing}
@@ -123,7 +123,7 @@ const Chatbot = () => {
           />
         </div>
         
-        {/* Bottom Section - Fixed */}
+        {/* Bottom Section - Fixed with safe area */}
         <div className="flex-shrink-0 safe-bottom">
           <MessageInputRow
             value={input}
