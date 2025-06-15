@@ -1,6 +1,6 @@
 
 import React, { useRef, useState } from "react";
-import { Mic } from "lucide-react";
+import { Mic, Files } from "lucide-react";
 import { useSpeechToText } from "@/lib/speech";
 
 interface Props {
@@ -18,6 +18,7 @@ const MessageInputRow: React.FC<Props> = ({
 }) => {
   const [listening, setListening] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { start, recognition } = useSpeechToText({
     onResult: (txt) => {
@@ -31,11 +32,44 @@ const MessageInputRow: React.FC<Props> = ({
     start();
   };
 
+  const handleFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      console.log("File selected:", file.name, file.type);
+      
+      // For now, just show an alert. In the future, this would handle file upload
+      alert(`File selected: ${file.name}\nType: ${file.type}\nSize: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+    }
+  };
+
   return (
     <div className="flex items-center gap-3 w-full px-6 py-4 bg-[#1a1f29] rounded-b-2xl">
-      <div className="flex-shrink-0 flex items-center justify-center h-11 w-11 rounded-lg bg-[#212635]">
-        <span className="block w-6 text-gray-400">{/* Book icon if needed */}</span>
-      </div>
+      {/* Files Upload Button */}
+      <button
+        title="Upload files or take photo"
+        className="flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg bg-[#212635] hover:bg-[#2a2f3a] transition text-gray-400 hover:text-gray-300"
+        onClick={handleFileUpload}
+        type="button"
+      >
+        <Files size={20} />
+      </button>
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.csv,.json"
+        capture="environment"
+        onChange={handleFileChange}
+        className="hidden"
+        multiple
+      />
+
       <input
         ref={inputRef}
         value={value}
