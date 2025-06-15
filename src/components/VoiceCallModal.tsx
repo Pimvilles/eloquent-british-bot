@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Phone, PhoneOff, Volume2, VolumeX } from "lucide-react";
 import { useSpeechToText, speakWithBrowser } from "@/lib/speech";
 import { useChat } from "@/hooks/useChat";
-import AvatarLogo from "./AvatarLogo";
+import VoiceCallStatus from "./VoiceCallStatus";
+import VoiceCallControls from "./VoiceCallControls";
+import CallDurationDisplay from "./CallDurationDisplay";
 
 interface VoiceCallModalProps {
   isOpen: boolean;
@@ -182,27 +182,6 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getStateIndicator = () => {
-    switch (callState) {
-      case "listening":
-        return { text: "Listening...", color: "text-green-400" };
-      case "processing":
-        return { text: "Processing...", color: "text-blue-400" };
-      case "speaking":
-        return { text: "Speaking...", color: "text-purple-400" };
-      default:
-        return { text: "Ready", color: "text-gray-400" };
-    }
-  };
-
-  const stateIndicator = getStateIndicator();
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -211,85 +190,22 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
         </DialogHeader>
         
         <div className="flex flex-col items-center space-y-6 py-4">
-          {/* Avatar with state indication */}
-          <div className="relative">
-            <AvatarLogo size={120} />
-            <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-xs font-medium ${stateIndicator.color} bg-gray-800 border border-gray-600`}>
-              {stateIndicator.text}
-            </div>
-          </div>
+          <VoiceCallStatus 
+            callState={callState}
+            currentTranscript={currentTranscript}
+          />
 
-          {/* Call Duration */}
-          <div className="text-lg font-mono text-gray-300">
-            {formatDuration(callDuration)}
-          </div>
+          <CallDurationDisplay duration={callDuration} />
 
-          {/* Current Transcript */}
-          {currentTranscript && (
-            <div className="w-full p-3 bg-gray-800 rounded-lg border">
-              <p className="text-sm text-gray-300 text-center">
-                "{currentTranscript}"
-              </p>
-            </div>
-          )}
-
-          {/* Controls */}
-          <div className="flex items-center space-x-4">
-            {/* Mute Button */}
-            <Button
-              variant={isMuted ? "destructive" : "outline"}
-              size="icon"
-              onClick={toggleMute}
-              className="h-12 w-12 rounded-full"
-            >
-              {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-            </Button>
-
-            {/* Push to Talk / Continuous Mode */}
-            <Button
-              variant="outline"
-              onClick={toggleListeningMode}
-              className="px-4 py-2 text-xs"
-            >
-              {isPushToTalk ? "Push to Talk" : "Continuous"}
-            </Button>
-
-            {/* End Call Button */}
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={handleEndCall}
-              className="h-12 w-12 rounded-full"
-            >
-              <PhoneOff className="h-5 w-5" />
-            </Button>
-          </div>
-
-          {/* Push to Talk Instructions */}
-          {isPushToTalk && (
-            <div className="text-center">
-              <p className="text-sm text-gray-400 mb-2">Hold Space to speak</p>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-32 h-16"
-                onMouseDown={handlePushToTalkStart}
-                onMouseUp={handlePushToTalkEnd}
-                onTouchStart={handlePushToTalkStart}
-                onTouchEnd={handlePushToTalkEnd}
-              >
-                <Mic className="h-6 w-6" />
-              </Button>
-            </div>
-          )}
-
-          {/* Instructions */}
-          <div className="text-center text-xs text-gray-500 max-w-sm">
-            {isPushToTalk 
-              ? "Press and hold the microphone button or Space key to speak" 
-              : "Speak naturally - Ghost will listen and respond automatically"
-            }
-          </div>
+          <VoiceCallControls
+            isMuted={isMuted}
+            isPushToTalk={isPushToTalk}
+            onToggleMute={toggleMute}
+            onToggleListeningMode={toggleListeningMode}
+            onEndCall={handleEndCall}
+            onPushToTalkStart={handlePushToTalkStart}
+            onPushToTalkEnd={handlePushToTalkEnd}
+          />
         </div>
       </DialogContent>
     </Dialog>
