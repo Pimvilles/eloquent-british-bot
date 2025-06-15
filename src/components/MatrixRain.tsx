@@ -6,15 +6,24 @@ const MatrixRain = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('[MatrixRain] Canvas ref not found');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('[MatrixRain] Canvas context not available');
+      return;
+    }
+    
+    console.log('[MatrixRain] Initializing canvas...');
     
     // Set canvas size
     const setCanvasSize = () => {
       canvas.width = window.innerWidth;
       canvas.height = 300;
+      console.log(`[MatrixRain] Canvas size set to ${canvas.width}x${canvas.height}`);
     };
     
     setCanvasSize();
@@ -24,6 +33,8 @@ const MatrixRain = () => {
     const fontSize = 16;
     let columns = Math.floor(canvas.width / fontSize);
     let drops: number[] = [];
+
+    console.log(`[MatrixRain] Columns: ${columns}`);
 
     // Initialize drops
     for (let x = 0; x < columns; x++) {
@@ -60,6 +71,7 @@ const MatrixRain = () => {
     };
     
     // Start animation
+    console.log('[MatrixRain] Starting animation...');
     draw();
 
     const handleResize = () => {
@@ -70,11 +82,13 @@ const MatrixRain = () => {
       for (let x = 0; x < columns; x++) {
         drops[x] = Math.random() * -100;
       }
+      console.log('[MatrixRain] Resized and reset drops');
     };
 
     window.addEventListener('resize', handleResize);
 
     return () => {
+      console.log('[MatrixRain] Cleaning up...');
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
     };
