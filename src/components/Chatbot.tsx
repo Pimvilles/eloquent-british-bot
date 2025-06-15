@@ -7,21 +7,45 @@ import BrandFooter from "./BrandFooter";
 import { speakWithBrowser } from "@/lib/speech";
 import { useChat } from "@/hooks/useChat";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { ProcessedFile } from "@/lib/fileUtils";
 
 const USER_NAME = "Mr Moloto";
 
 const Chatbot = () => {
   const [input, setInput] = useState("");
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<ProcessedFile[]>([]);
   const { isDarkMode } = useDarkMode();
   
   const { messages, isProcessing, sendMessage, handleClearHistory } = useChat();
 
   const handleSend = async () => {
     const question = input.trim();
-    if (!question) return;
+    let messageContent = question;
+    
+    // Add file information to the message if files are selected
+    if (selectedFiles.length > 0) {
+      const fileDescriptions = selectedFiles.map(file => {
+        if (file.isImage) {
+          return `Image: ${file.name} (${file.type})`;
+        } else if (file.isDocument) {
+          return `Document: ${file.name}`;
+        } else if (file.isMedia) {
+          return `Media: ${file.name} (${file.type})`;
+        }
+        return `File: ${file.name}`;
+      }).join(', ');
+      
+      messageContent = question 
+        ? `${question}\n\nAttached files: ${fileDescriptions}`
+        : `Attached files: ${fileDescriptions}`;
+    }
+    
+    if (!messageContent && selectedFiles.length === 0) return;
+    
     setInput("");
-    await sendMessage(question);
+    setSelectedFiles([]);
+    await sendMessage(messageContent);
   };
 
   const handlePlayMessage = (text: string, idx: number) => {
@@ -39,6 +63,10 @@ const Chatbot = () => {
 
   const handleVoiceCall = () => {
     alert("Voice call coming soon!");
+  };
+
+  const handleFilesSelected = (files: ProcessedFile[]) => {
+    setSelectedFiles(files);
   };
 
   return (
@@ -67,6 +95,7 @@ const Chatbot = () => {
           onChange={setInput}
           onSend={handleSend}
           onSpeechResult={handleSpeechToTextResult}
+          onFilesSelected={handleFilesSelected}
         />
       </div>
       
