@@ -133,6 +133,7 @@ const Chatbot = () => {
         onClose={handleCloseSidebar}
         messages={messages}
         onClearHistory={handleClearHistory}
+        onNewChat={handleNewChat}
         onMessageClick={handleMessageClick}
       />
     </>

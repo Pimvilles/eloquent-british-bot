@@ -1,15 +1,7 @@
 
 import React from "react";
-import { Menu, Settings, Moon, Sun, History, Trash2, Pencil } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import AvatarLogo from "./AvatarLogo";
 
@@ -30,7 +22,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onOpenSidebar,
   onNewChat
 }) => {
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { isDarkMode } = useDarkMode();
 
   return (
     <div className={`flex items-center justify-between px-8 py-6 transition-colors duration-300 ${
@@ -38,8 +30,8 @@ const TopBar: React.FC<TopBarProps> = ({
         ? 'border-b border-[#232938]' 
         : 'border-b border-gray-200'
     }`}>
-      {/* Hamburger Menu and New Chat */}
-      <div className="flex items-center gap-4">
+      {/* Hamburger Menu */}
+      <div className="flex items-center">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -50,61 +42,6 @@ const TopBar: React.FC<TopBarProps> = ({
         >
           <Menu className="h-6 w-6" />
         </Button>
-
-        {/* New Chat Button */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className={`text-green-500 transition-colors duration-300 ${
-            isDarkMode ? 'hover:bg-[#232938]' : 'hover:bg-gray-100'
-          }`}
-          onClick={onNewChat}
-        >
-          <Pencil className="h-6 w-6" />
-        </Button>
-
-        {/* Settings Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className={`text-blue-500 transition-colors duration-300 ${
-              isDarkMode ? 'hover:bg-[#232938]' : 'hover:bg-gray-100'
-            }`}>
-              <Settings className="h-6 w-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className={`min-w-[200px] transition-colors duration-300 ${
-            isDarkMode 
-              ? 'bg-[#232938] border-[#3b4251] text-white' 
-              : 'bg-white border-gray-200 text-gray-900'
-          }`}>
-            {/* Dark Mode Toggle */}
-            <DropdownMenuItem 
-              className={`cursor-pointer flex items-center justify-between transition-colors duration-300 ${
-                isDarkMode ? 'hover:bg-[#3b4251]' : 'hover:bg-gray-100'
-              }`} 
-              onClick={(e) => {
-                e.preventDefault();
-                toggleDarkMode();
-              }}
-            >
-              <div className="flex items-center">
-                {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-                {isDarkMode ? "Light Mode" : "Dark Mode"}
-              </div>
-              <Switch checked={isDarkMode} onChange={toggleDarkMode} />
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator className={isDarkMode ? 'bg-[#3b4251]' : 'bg-gray-200'} />
-            
-            {/* Clear History */}
-            <DropdownMenuItem className={`cursor-pointer transition-colors duration-300 ${
-              isDarkMode ? 'hover:bg-[#3b4251]' : 'hover:bg-gray-100'
-            }`} onClick={onClearHistory}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Clear History
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Centered Greeting */}

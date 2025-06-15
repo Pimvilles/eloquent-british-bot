@@ -1,6 +1,6 @@
 
 import React from "react";
-import { X, MessageCircle, Trash2 } from "lucide-react";
+import { X, MessageCircle, Trash2, Pencil, Settings, Moon, Sun } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -8,7 +8,9 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { useDarkMode } from "@/hooks/useDarkMode";
 
 interface Message {
@@ -22,6 +24,7 @@ interface ChatHistorySidebarProps {
   onClose: () => void;
   messages: Message[];
   onClearHistory: () => void;
+  onNewChat: () => void;
   onMessageClick?: (message: Message, index: number) => void;
 }
 
@@ -30,12 +33,18 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
   onClose,
   messages,
   onClearHistory,
+  onNewChat,
   onMessageClick,
 }) => {
-  const { isDarkMode } = useDarkMode();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleClearHistory = () => {
     onClearHistory();
+    onClose();
+  };
+
+  const handleNewChat = () => {
+    onNewChat();
     onClose();
   };
 
@@ -52,27 +61,80 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
         <SheetHeader className={`p-6 border-b transition-colors duration-300 ${
           isDarkMode ? 'border-[#232938]' : 'border-gray-200'
         }`}>
-          <div className="flex items-center justify-between">
-            <SheetTitle className={`text-lg font-semibold ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>
-              Chat History ({messages.length})
-            </SheetTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearHistory}
-              className={`text-red-500 hover:text-red-600 transition-colors duration-300 ${
-                isDarkMode ? 'hover:bg-[#232938]' : 'hover:bg-gray-100'
-              }`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+          <SheetTitle className={`text-lg font-semibold ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>
+            Menu
+          </SheetTitle>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 h-[calc(100vh-80px)]">
-          <div className="p-4 space-y-3">
+        <div className="p-4 space-y-4">
+          {/* New Chat Button */}
+          <Button
+            variant="ghost"
+            className={`w-full justify-start gap-3 transition-colors duration-300 ${
+              isDarkMode 
+                ? 'text-green-400 hover:bg-[#232938] hover:text-green-300' 
+                : 'text-green-600 hover:bg-green-50 hover:text-green-700'
+            }`}
+            onClick={handleNewChat}
+          >
+            <Pencil className="h-4 w-4" />
+            New Chat
+          </Button>
+
+          <Separator className={isDarkMode ? 'bg-[#232938]' : 'bg-gray-200'} />
+
+          {/* Settings Section */}
+          <div className="space-y-2">
+            <h3 className={`text-sm font-medium ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              Settings
+            </h3>
+            
+            {/* Dark Mode Toggle */}
+            <div className={`flex items-center justify-between p-2 rounded-lg transition-colors duration-300 ${
+              isDarkMode ? 'hover:bg-[#232938]' : 'hover:bg-gray-100'
+            }`}>
+              <div className="flex items-center gap-3">
+                {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                <span className="text-sm">
+                  {isDarkMode ? "Light Mode" : "Dark Mode"}
+                </span>
+              </div>
+              <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
+            </div>
+
+            {/* Clear History */}
+            <Button
+              variant="ghost"
+              className={`w-full justify-start gap-3 transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'text-red-400 hover:bg-[#232938] hover:text-red-300' 
+                  : 'text-red-600 hover:bg-red-50 hover:text-red-700'
+              }`}
+              onClick={handleClearHistory}
+            >
+              <Trash2 className="h-4 w-4" />
+              Clear History
+            </Button>
+          </div>
+
+          <Separator className={isDarkMode ? 'bg-[#232938]' : 'bg-gray-200'} />
+
+          {/* Chat History Section */}
+          <div className="space-y-2">
+            <h3 className={`text-sm font-medium ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              Chat History ({messages.length})
+            </h3>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1 h-[calc(100vh-300px)]">
+          <div className="p-4 pt-0 space-y-3">
             {messages.length === 0 ? (
               <div className={`text-center py-8 ${
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
