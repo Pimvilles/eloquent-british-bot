@@ -90,7 +90,6 @@ const Chatbot = () => {
     console.log("[Chatbot] Connecting to MCP SSE with prompt...");
     const disconnect = connectZapierMCP(
       ZAPIER_MCP_SSE,
-      // system prompt + user message for context
       `[SYSTEM INSTRUCTIONS]\n${SYSTEM_PROMPT}\n\n[CHAT CONTEXT]\n${getContext(messages)}\n\n[REQUEST]\n${question}`,
       (data) => {
         console.log("[Chatbot] Received SSE data:", data);
@@ -100,7 +99,7 @@ const Chatbot = () => {
           if (botMsg.trim()) {
             setMessages((prev) => [
               ...prev,
-              { text: botMsg.trim(), sender: "bot", time: getNow() },
+              { text: botMsg.trim(), sender: "bot" as const, time: getNow() },
             ]);
             console.log("[Chatbot] Added final bot reply:", botMsg.trim());
           }
@@ -113,9 +112,9 @@ const Chatbot = () => {
               prev.length > 0 &&
               prev[prev.length - 1].text === "Ghost is thinking..."
             ) {
-              const updated = [
+              const updated: Message[] = [
                 ...prev.slice(0, -1),
-                { text: botMsg, sender: "bot", time: getNow() },
+                { text: botMsg, sender: "bot" as const, time: getNow() },
               ];
               console.log("[Chatbot] Streaming bot msg update:", botMsg);
               return updated;
