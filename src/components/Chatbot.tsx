@@ -4,6 +4,7 @@ import MessageList from "./MessageList";
 import MessageInputRow from "./MessageInputRow";
 import BrandFooter from "./BrandFooter";
 import PWAInstallPrompt from "./PWAInstallPrompt";
+import ChatHistorySidebar from "./ChatHistorySidebar";
 import { speakWithBrowser } from "@/lib/speech";
 import { useChat } from "@/hooks/useChat";
 import { useDarkMode } from "@/hooks/useDarkMode";
@@ -15,6 +16,7 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<ProcessedFile[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isDarkMode } = useDarkMode();
   
   const { messages, isProcessing, sendMessage, handleClearHistory } = useChat();
@@ -69,6 +71,19 @@ const Chatbot = () => {
     setSelectedFiles(files);
   };
 
+  const handleOpenSidebar = () => {
+    setIsSidebarOpen(true);
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  const handleMessageClick = (message: any, index: number) => {
+    // Could implement message jumping or highlighting here
+    console.log('Clicked message:', message, 'at index:', index);
+  };
+
   return (
     <>
       <PWAInstallPrompt />
@@ -82,6 +97,7 @@ const Chatbot = () => {
           messageCount={messages.length}
           onClearHistory={handleClearHistory}
           onVoiceCall={handleVoiceCall}
+          onOpenSidebar={handleOpenSidebar}
         />
         
         <MessageList
@@ -109,6 +125,14 @@ const Chatbot = () => {
         
         <BrandFooter />
       </div>
+
+      <ChatHistorySidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        messages={messages}
+        onClearHistory={handleClearHistory}
+        onMessageClick={handleMessageClick}
+      />
     </>
   );
 };
