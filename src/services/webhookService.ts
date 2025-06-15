@@ -1,4 +1,5 @@
 
+
 const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
 export const sendToWebhook = async (message: string, sender: "user" | "bot"): Promise<string | null> => {
@@ -20,12 +21,25 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot"): Pr
     });
     
     if (response.ok) {
-      const data = await response.json();
-      console.log("Webhook response:", data);
+      const contentType = response.headers.get("content-type");
+      console.log("Response content type:", contentType);
       
-      // Extract the AI response from the expected format
-      if (data && data.output) {
-        return data.output;
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        console.log("Webhook JSON response:", data);
+        
+        // Extract the AI response from the expected format
+        if (data && data.output) {
+          return data.output;
+        }
+      } else {
+        // Handle plain text response
+        const textResponse = await response.text();
+        console.log("Webhook text response:", textResponse);
+        
+        if (textResponse && textResponse.trim()) {
+          return textResponse.trim();
+        }
       }
     }
     
@@ -57,3 +71,4 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot"): Pr
     return null;
   }
 };
+
