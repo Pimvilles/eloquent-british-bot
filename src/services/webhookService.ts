@@ -1,4 +1,4 @@
-const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
+const WEBHOOK_URL = "http://localhost:5678/webhook/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
 export const sendToWebhook = async (message: string, sender: "user" | "bot"): Promise<string | null> => {
   try {
