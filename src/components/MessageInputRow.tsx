@@ -123,15 +123,15 @@ const MessageInputRow: React.FC<Props> = ({
         if (e.key === "Enter" && (value.trim() || selectedFiles.length > 0)) {
           handleSend();
         }
-      }} placeholder="Enter a prompt here" className="flex-1 bg-[#232937] text-white px-4 py-3 rounded-xl border-none outline-none placeholder-gray-400 text-base" style={{
+      }} placeholder="Enter a prompt here" style={{
         minHeight: 44,
         maxHeight: 80
-      }} />
+      }} className="flex-1 bg-[#232937] text-white rounded-xl border-none outline-none placeholder-gray-400 text-base px-[10px] py-[10px]" />
         <button title="Mic" className={`h-11 w-11 flex items-center justify-center rounded-lg ${listening ? "bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} transition text-white`} onClick={startMic} disabled={listening} type="button">
           <Mic size={24} />
         </button>
         <button title="Send" className={`h-11 w-11 flex items-center justify-center rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 transition text-white`} onClick={handleSend} disabled={!value.trim() && selectedFiles.length === 0} type="button">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="px-0">
             <path d="M3 20v-6l16-2-16-2V4l19 8-19 8Z" fill="currentColor" />
           </svg>
         </button>
