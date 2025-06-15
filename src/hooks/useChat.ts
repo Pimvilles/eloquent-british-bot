@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, clearConversation, saveChatToHistory } from "@/lib/memory";
@@ -48,8 +49,6 @@ export const useChat = () => {
     
     if (webhookResponse) {
       console.log("[Voice] Got webhook response:", webhookResponse);
-      // Log the bot response to webhook
-      await sendToWebhook(webhookResponse, "bot");
       return webhookResponse;
     }
 
@@ -90,8 +89,7 @@ export const useChat = () => {
         ...prev,
         { text: webhookResponse, sender: "bot" as const, time: getNow() },
       ]);
-      // Send bot response to webhook for logging
-      await sendToWebhook(webhookResponse, "bot");
+      // Don't send bot response back to webhook to avoid feedback loop
       return;
     }
 
@@ -112,8 +110,6 @@ export const useChat = () => {
               { text: finalResponse, sender: "bot" as const, time: getNow() },
             ]);
             console.log("[Chat] Added final bot reply:", finalResponse);
-            // Send final bot response to webhook
-            sendToWebhook(finalResponse, "bot");
           } else if (mcpFailed) {
             // If MCP failed and we have no response, show fallback
             const fallbackResponse = "Sorry, I'm having trouble connecting to my tools right now. Please try again in a moment.";
@@ -121,7 +117,6 @@ export const useChat = () => {
               ...prev,
               { text: fallbackResponse, sender: "bot" as const, time: getNow() },
             ]);
-            sendToWebhook(fallbackResponse, "bot");
           }
         } else if (data.message) {
           botMsg += data.message;

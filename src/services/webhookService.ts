@@ -1,10 +1,17 @@
+
 const WEBHOOK_URL = "http://localhost:5678/webhook/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
 export const sendToWebhook = async (message: string, sender: "user" | "bot"): Promise<string | null> => {
+  // Only send user messages to webhook to get AI responses
+  // Don't send bot messages back to webhook to avoid feedback loop
+  if (sender === "bot") {
+    console.log("Skipping webhook call for bot message to avoid feedback loop");
+    return null;
+  }
+
   try {
     console.log("Sending to webhook:", { message, sender });
     
-    // Try without no-cors first to get the response
     const response = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: {
@@ -70,7 +77,7 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot"): Pr
   }
 };
 
-// New function specifically for voice calls that returns the response directly
+// Voice call function - only send user messages to webhook
 export const sendVoiceMessageToWebhook = async (message: string): Promise<string | null> => {
   try {
     console.log("Sending voice message to webhook:", { message });
