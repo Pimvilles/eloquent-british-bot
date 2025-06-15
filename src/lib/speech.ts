@@ -31,7 +31,7 @@ export function useSpeechToText({
     }
   };
 
-  return { start, recognition: !!recognition };
+  return { start, recognition };
 }
 
 // TTS using Web Speech API (Browser-native and free)
