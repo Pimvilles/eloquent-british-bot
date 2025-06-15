@@ -1,0 +1,29 @@
+
+{
+  "name": "Eloquent British Bot",
+  "short_name": "Ghost Bot",
+  "description": "AI Chatbot with file upload and voice capabilities",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#171c23",
+  "theme_color": "#171c23",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/lovable-uploads/a18ab021-2b37-4e5c-97a3-00608fc26747.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/lovable-uploads/a18ab021-2b37-4e5c-97a3-00608fc26747.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}
