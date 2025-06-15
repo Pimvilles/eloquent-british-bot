@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
 import MessageInputRow from "./MessageInputRow";
@@ -6,6 +7,14 @@ import BrandFooter from "./BrandFooter";
 import { speakWithBrowser } from "@/lib/speech";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, MemoryMessage } from "@/lib/memory";
+import { Menu, Settings } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const BOT_NAME = "Ghost";
 const USER_NAME = "Mr Moloto";
@@ -32,10 +41,10 @@ You have access to the following tools:
 Rules:
 - Focus on executing tasks and returning actionable results, not on extended conversation.
 - Ask questions only if absolutely necessary.
-- General knowledge, facts, or witty remarks should be rare—only if they don’t distract from the task.
+- General knowledge, facts, or witty remarks should be rare—only if they don't distract from the task.
 - Be concise and businesslike, but still polite and respectful.
 - Only tease or joke if Mr Moloto invites it.
-- Always address him as “Mr Moloto”.
+- Always address him as "Mr Moloto".
 
 Whenever a task is requested, quickly determine which tool is best and use it.
 
@@ -185,12 +194,30 @@ const Chatbot = () => {
   return (
     <div className="flex flex-col justify-between min-h-[95vh] w-full bg-[#171c23] mx-auto rounded-2xl shadow-2xl">
       {/* Top Bar */}
-      <div className="flex items-center border-b border-[#232938] px-8 py-6">
-        <div className="flex-1">
+      <div className="flex items-center justify-between border-b border-[#232938] px-8 py-6">
+        {/* Hamburger Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-blue-500 hover:bg-[#232938]">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="bg-[#232938] border-[#3b4251] text-white">
+            <DropdownMenuItem className="hover:bg-[#3b4251] cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Centered Greeting */}
+        <div className="flex-1 flex justify-center">
           <h2 className="text-3xl font-extrabold text-blue-500 mb-0">
             Hello, {USER_NAME}
           </h2>
         </div>
+
+        {/* Avatar */}
         <div className="flex-shrink-0">
           <AvatarLogo size={68} />
         </div>
