@@ -1,7 +1,6 @@
 
 import React, { useRef, useEffect } from "react";
 import ChatBubble from "./ChatBubble";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDarkMode } from "@/hooks/useDarkMode";
 
 interface Message {
@@ -23,17 +22,14 @@ const MessageList: React.FC<MessageListProps> = ({
   ttsMessageIdx, 
   onPlayMessage 
 }) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { isDarkMode } = useDarkMode();
   const [shouldAutoScroll, setShouldAutoScroll] = React.useState(true);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (scrollAreaRef.current && shouldAutoScroll) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
+    if (scrollContainerRef.current && shouldAutoScroll) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [messages.length, shouldAutoScroll]);
 
@@ -47,12 +43,16 @@ const MessageList: React.FC<MessageListProps> = ({
 
   return (
     <div className="flex-1 w-full transition-colors duration-300 relative" style={{ minHeight: 340 }}>
-      <ScrollArea 
-        ref={scrollAreaRef}
-        className="h-full w-full"
-        onScrollCapture={handleScroll}
+      <div 
+        ref={scrollContainerRef}
+        className="h-full w-full overflow-y-scroll custom-scrollbar"
+        onScroll={handleScroll}
+        style={{
+          scrollbarWidth: '16px',
+          scrollbarColor: isDarkMode ? '#4a5568 #2d3748' : '#718096 #e2e8f0'
+        }}
       >
-        <div className="px-12 pt-6 pb-4 pr-20">
+        <div className="px-12 pt-6 pb-4 pr-8">
           <div className="w-full max-w-5xl mx-auto">
             {messages.map((msg, i) => (
               <ChatBubble
@@ -70,7 +70,7 @@ const MessageList: React.FC<MessageListProps> = ({
             ))}
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };

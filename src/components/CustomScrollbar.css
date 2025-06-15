@@ -1,0 +1,53 @@
+
+/* Custom scrollbar styles for MessageList */
+.custom-scrollbar {
+  /* WebKit browsers (Chrome, Safari, Edge) */
+  scrollbar-width: 16px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 16px;
+  background-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  min-height: 30px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #2d3748;
+  background-clip: content-box;
+}
+
+/* Dark mode styles */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #718096;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thick;
+  scrollbar-color: #4a5568 rgba(0, 0, 0, 0.1);
+}
+
+.dark .custom-scrollbar {
+  scrollbar-color: #718096 rgba(255, 255, 255, 0.1);
+}

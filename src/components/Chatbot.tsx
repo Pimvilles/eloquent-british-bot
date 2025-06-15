@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import TopBar from "./TopBar";
 import MessageList from "./MessageList";
@@ -12,6 +11,7 @@ import { useChat } from "@/hooks/useChat";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useVoiceCall } from "@/hooks/useVoiceCall";
 import { ProcessedFile } from "@/lib/fileUtils";
+import "./CustomScrollbar.css";
 
 const USER_NAME = "Mr Moloto";
 
