@@ -35,6 +35,13 @@ export function loadConversation(): MemoryMessage[] {
   ];
 }
 
+// Clear conversation history
+export function clearConversation() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
 function getNow() {
   const date = new Date();
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
 import MessageInputRow from "./MessageInputRow";
@@ -6,15 +5,18 @@ import AvatarLogo from "./AvatarLogo";
 import BrandFooter from "./BrandFooter";
 import { speakWithBrowser } from "@/lib/speech";
 import { connectZapierMCP } from "@/lib/zapierMCP";
-import { loadConversation, saveConversation, MemoryMessage } from "@/lib/memory";
-import { Menu, Settings } from "lucide-react";
+import { loadConversation, saveConversation, MemoryMessage, clearConversation } from "@/lib/memory";
+import { Menu, Settings, Moon, Sun, History, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 const BOT_NAME = "Ghost";
 const USER_NAME = "Mr Moloto";
@@ -64,11 +66,23 @@ const Chatbot = () => {
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
   // Tool/stream state
   const [isProcessing, setIsProcessing] = useState(false);
+  // Dark mode
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   // Save messages to memory each change
   React.useEffect(() => {
     saveConversation(messages);
   }, [messages]);
+
+  // Clear conversation history
+  const handleClearHistory = () => {
+    clearConversation();
+    setMessages([{
+      text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+      sender: "bot",
+      time: getNow(),
+    }]);
+  };
 
   // Handle user send
   async function sendMessage() {
@@ -202,10 +216,34 @@ const Chatbot = () => {
               <Menu className="h-6 w-6" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="bg-[#232938] border-[#3b4251] text-white">
+          <DropdownMenuContent align="start" className="bg-[#232938] border-[#3b4251] text-white min-w-[200px]">
             <DropdownMenuItem className="hover:bg-[#3b4251] cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
               Settings
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator className="bg-[#3b4251]" />
+            
+            {/* Dark Mode Toggle */}
+            <DropdownMenuItem className="hover:bg-[#3b4251] cursor-pointer flex items-center justify-between" onClick={toggleDarkMode}>
+              <div className="flex items-center">
+                {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                {isDarkMode ? "Light Mode" : "Dark Mode"}
+              </div>
+              <Switch checked={isDarkMode} />
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator className="bg-[#3b4251]" />
+            
+            {/* Conversation History */}
+            <DropdownMenuItem className="hover:bg-[#3b4251] cursor-pointer" onClick={handleClearHistory}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Clear History
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem className="hover:bg-[#3b4251] cursor-pointer">
+              <History className="mr-2 h-4 w-4" />
+              History ({messages.length} messages)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
