@@ -10,7 +10,16 @@ const BrandFooter = () => {
       <span className={`text-sm transition-colors duration-300 ${
         isDarkMode ? "text-blue-400" : "text-blue-600"
       }`}>
-        Powered By: Kwena Moloto A.I Solutions
+        Powered By: <a 
+          href="https://www.kwenamai.co.za" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className={`hover:underline transition-colors duration-300 ${
+            isDarkMode ? "hover:text-blue-300" : "hover:text-blue-800"
+          }`}
+        >
+          Kwena Moloto A.I Solutions
+        </a>
       </span>
     </footer>
   );
