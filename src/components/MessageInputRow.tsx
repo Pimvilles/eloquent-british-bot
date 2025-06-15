@@ -1,6 +1,6 @@
 
 import React, { useRef, useState } from "react";
-import { Mic, PhoneCall } from "lucide-react";
+import { Mic } from "lucide-react";
 import { useSpeechToText } from "@/lib/speech";
 
 interface Props {
@@ -70,17 +70,6 @@ const MessageInputRow: React.FC<Props> = ({
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M3 20v-6l16-2-16-2V4l19 8-19 8Z" fill="currentColor"/>
         </svg>
-      </button>
-      {/* Blue Call Button */}
-      <button
-        title="Start Call"
-        className="ml-4 flex items-center justify-center rounded-full bg-blue-400 hover:bg-blue-500 shadow-xl w-16 h-16"
-        style={{ boxShadow: "0 0 18px 2px #23aefd88" }}
-        type="button"
-        // For now: alert user, future = open voice session
-        onClick={() => alert("Voice call coming soon!")}
-      >
-        <PhoneCall size={32} color="white" />
       </button>
     </div>
   );

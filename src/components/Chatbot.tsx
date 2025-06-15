@@ -37,6 +37,10 @@ const Chatbot = () => {
     setInput(txt);
   };
 
+  const handleVoiceCall = () => {
+    alert("Voice call coming soon!");
+  };
+
   return (
     <div className={`flex flex-col justify-between min-h-[95vh] w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 ${
       isDarkMode 
@@ -47,6 +51,7 @@ const Chatbot = () => {
         userName={USER_NAME}
         messageCount={messages.length}
         onClearHistory={handleClearHistory}
+        onVoiceCall={handleVoiceCall}
       />
       
       <MessageList

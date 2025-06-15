@@ -17,9 +17,10 @@ interface TopBarProps {
   userName: string;
   messageCount: number;
   onClearHistory: () => void;
+  onVoiceCall?: () => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ userName, messageCount, onClearHistory }) => {
+const TopBar: React.FC<TopBarProps> = ({ userName, messageCount, onClearHistory, onVoiceCall }) => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   return (
@@ -94,9 +95,9 @@ const TopBar: React.FC<TopBarProps> = ({ userName, messageCount, onClearHistory 
         </h2>
       </div>
 
-      {/* Avatar */}
+      {/* Avatar with Voice Call */}
       <div className="flex-shrink-0">
-        <AvatarLogo size={68} />
+        <AvatarLogo size={68} onClick={onVoiceCall} />
       </div>
     </div>
   );
