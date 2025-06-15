@@ -5,9 +5,11 @@ import MessageInputRow from "./MessageInputRow";
 import BrandFooter from "./BrandFooter";
 import PWAInstallPrompt from "./PWAInstallPrompt";
 import ChatHistorySidebar from "./ChatHistorySidebar";
+import VoiceCallModal from "./VoiceCallModal";
 import { speakWithBrowser } from "@/lib/speech";
 import { useChat } from "@/hooks/useChat";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useVoiceCall } from "@/hooks/useVoiceCall";
 import { ProcessedFile } from "@/lib/fileUtils";
 
 const USER_NAME = "Mr Moloto";
@@ -20,6 +22,7 @@ const Chatbot = () => {
   const { isDarkMode } = useDarkMode();
   
   const { messages, isProcessing, sendMessage, handleClearHistory, handleNewChat, loadMessageContext } = useChat();
+  const { isCallActive, startCall, endCall } = useVoiceCall();
 
   const handleSend = async () => {
     const question = input.trim();
@@ -64,7 +67,11 @@ const Chatbot = () => {
   };
 
   const handleVoiceCall = () => {
-    alert("Voice call coming soon!");
+    startCall();
+  };
+
+  const handleEndVoiceCall = () => {
+    endCall();
   };
 
   const handleFilesSelected = (files: ProcessedFile[]) => {
@@ -135,6 +142,11 @@ const Chatbot = () => {
         onClearHistory={handleClearHistory}
         onNewChat={handleNewChat}
         onMessageClick={handleMessageClick}
+      />
+
+      <VoiceCallModal
+        isOpen={isCallActive}
+        onClose={handleEndVoiceCall}
       />
     </>
   );
