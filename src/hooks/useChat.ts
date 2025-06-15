@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, clearConversation, saveChatToHistory, loadChatHistory } from "@/lib/memory";
@@ -10,6 +11,8 @@ interface Message {
 
 const ZAPIER_MCP_SSE =
   "https://mcp.zapier.com/api/mcp/s/OTNjMDc2MmEtZGIzNC00N2YwLTkyYTQtM2U3NTViMTQ4ZDc3OjdmZmZkNmFkLWJhZTMtNDgzYy1iNDgxLTIyZDk1ZThhYzE2Nw==/sse";
+
+const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
 const SYSTEM_PROMPT = `You are Melsi—a sharp, witty, British-born, Mzansi-raised AI assistant. Your top priority is to complete tasks and deliver results efficiently for Mr Kwena Moloto, CEO of Kwena Moloto A.I Solutions in Johannesburg, South Africa.
 
@@ -53,6 +56,26 @@ function getContext(messages: Message[]) {
     .join("\n");
 }
 
+const sendToWebhook = async (message: string, sender: "user" | "bot") => {
+  try {
+    console.log("Sending to webhook:", { message, sender });
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        sender,
+        timestamp: new Date().toISOString(),
+        from: "Melsi Chatbot",
+      }),
+    });
+  } catch (error) {
+    console.error("Error sending to webhook:", error);
+  }
+};
+
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>(() => loadConversation());
   const [isProcessing, setIsProcessing] = useState(false);
@@ -95,10 +118,11 @@ export const useChat = () => {
   const sendMessage = async (question: string) => {
     if (!question.trim()) return;
     
-    setMessages((prev) => [
-      ...prev,
-      { text: question, sender: "user", time: getNow() },
-    ]);
+    const userMessage = { text: question, sender: "user" as const, time: getNow() };
+    setMessages((prev) => [...prev, userMessage]);
+    
+    // Send user message to webhook
+    await sendToWebhook(question, "user");
     
     // Handle greetings locally with faster response
     const greetings = [
@@ -116,17 +140,21 @@ export const useChat = () => {
       )
     ) {
       setIsProcessing(false);
+      const greetingResponse = "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?";
+      
       // Faster greeting response - no delay
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
           {
-            text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
+            text: greetingResponse,
             sender: "bot" as const,
             time: getNow(),
           },
         ]);
-      }, 100); // Reduced from no delay to minimal 100ms for smoother UX
+        // Send greeting response to webhook
+        sendToWebhook(greetingResponse, "bot");
+      }, 100);
       return;
     }
 
@@ -154,11 +182,14 @@ export const useChat = () => {
           setIsProcessing(false);
           removeThinking();
           if (botMsg.trim()) {
+            const finalResponse = botMsg.trim();
             setMessages((prev) => [
               ...prev,
-              { text: botMsg.trim(), sender: "bot" as const, time: getNow() },
+              { text: finalResponse, sender: "bot" as const, time: getNow() },
             ]);
-            console.log("[Chat] Added final bot reply:", botMsg.trim());
+            console.log("[Chat] Added final bot reply:", finalResponse);
+            // Send final bot response to webhook
+            sendToWebhook(finalResponse, "bot");
           }
         } else if (data.message) {
           botMsg += data.message;
