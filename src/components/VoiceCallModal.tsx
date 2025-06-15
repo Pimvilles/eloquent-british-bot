@@ -48,7 +48,7 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
       // Start with a greeting
       setCallState("speaking");
       speakWithBrowser({
-        text: "Voice call connected! I'm Ghost, ready to assist you Mr Moloto. How can I help?",
+        text: "Voice call connected! I'm Melsi, ready to assist you Mr Moloto. How can I help?",
         onStart: () => setCallState("speaking"),
         onEnd: () => {
           setCallState("idle");
@@ -186,7 +186,7 @@ const VoiceCallModal: React.FC<VoiceCallModalProps> = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Voice Call with Ghost</DialogTitle>
+          <DialogTitle className="text-center">Voice Call with Melsi</DialogTitle>
         </DialogHeader>
         
         <div className="flex flex-col items-center space-y-6 py-4">

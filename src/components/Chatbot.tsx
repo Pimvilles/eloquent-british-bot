@@ -128,7 +128,7 @@ const Chatbot = () => {
         
         {isProcessing && (
           <div className="w-full flex justify-center py-3 text-blue-400 animate-pulse">
-            <span>Ghost is executing your request...</span>
+            <span>Melsi is executing your request...</span>
           </div>
         )}
         

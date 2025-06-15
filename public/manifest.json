@@ -1,7 +1,7 @@
 
 {
   "name": "Eloquent British Bot",
-  "short_name": "Ghost Bot",
+  "short_name": "Melsi Bot",
   "description": "AI Chatbot with file upload and voice capabilities",
   "start_url": "/",
   "display": "standalone",

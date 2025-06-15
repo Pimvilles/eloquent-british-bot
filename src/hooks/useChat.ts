@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, clearConversation, saveChatToHistory, loadChatHistory } from "@/lib/memory";
@@ -12,7 +11,7 @@ interface Message {
 const ZAPIER_MCP_SSE =
   "https://mcp.zapier.com/api/mcp/s/OTNjMDc2MmEtZGIzNC00N2YwLTkyYTQtM2U3NTViMTQ4ZDc3OjdmZmZkNmFkLWJhZTMtNDgzYy1iNDgxLTIyZDk1ZThhYzE2Nw==/sse";
 
-const SYSTEM_PROMPT = `You are Ghost—a sharp, witty, British-born, Mzansi-raised AI assistant. Your top priority is to complete tasks and deliver results efficiently for Mr Kwena Moloto, CEO of Kwena Moloto A.I Solutions in Johannesburg, South Africa.
+const SYSTEM_PROMPT = `You are Melsi—a sharp, witty, British-born, Mzansi-raised AI assistant. Your top priority is to complete tasks and deliver results efficiently for Mr Kwena Moloto, CEO of Kwena Moloto A.I Solutions in Johannesburg, South Africa.
 
 You have full access to business and productivity tools via Zapier MCP. For any actionable request, you must immediately analyse which tool to use and call that tool to perform the task. Do not just describe what you could do—**always act and deliver real results**. Only ask for confirmation if absolutely necessary, and then act without further back-and-forth.
 
@@ -49,7 +48,7 @@ function getContext(messages: Message[]) {
     .slice(-10)
     .map(
       (msg) =>
-        `[${msg.sender === "user" ? "Mr Moloto" : "Ghost"}] ${msg.text}`
+        `[${msg.sender === "user" ? "Mr Moloto" : "Melsi"}] ${msg.text}`
     )
     .join("\n");
 }
@@ -65,7 +64,7 @@ export const useChat = () => {
   const handleClearHistory = () => {
     clearConversation();
     setMessages([{
-      text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+      text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
       sender: "bot",
       time: getNow(),
     }]);
@@ -80,7 +79,7 @@ export const useChat = () => {
     // Clear current conversation and start fresh
     clearConversation();
     setMessages([{
-      text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+      text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
       sender: "bot",
       time: getNow(),
     }]);
@@ -122,7 +121,7 @@ export const useChat = () => {
         setMessages((prev) => [
           ...prev,
           {
-            text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+            text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
             sender: "bot" as const,
             time: getNow(),
           },
@@ -136,12 +135,12 @@ export const useChat = () => {
     let botMsg = "";
     setMessages((prev) => [
       ...prev,
-      { text: "Ghost is thinking...", sender: "bot" as const, time: getNow() },
+      { text: "Melsi is thinking...", sender: "bot" as const, time: getNow() },
     ]);
 
     const removeThinking = () => {
       setMessages((prev) =>
-        prev.filter((m) => m.text !== "Ghost is thinking...")
+        prev.filter((m) => m.text !== "Melsi is thinking...")
       );
     };
 
@@ -167,7 +166,7 @@ export const useChat = () => {
           setMessages((prev) => {
             if (
               prev.length > 0 &&
-              prev[prev.length - 1].text === "Ghost is thinking..."
+              prev[prev.length - 1].text === "Melsi is thinking..."
             ) {
               const updated: Message[] = [
                 ...prev.slice(0, -1),
