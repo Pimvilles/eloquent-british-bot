@@ -42,13 +42,14 @@ const MessageList: React.FC<MessageListProps> = ({
   };
 
   return (
-    <div className="flex-1 w-full transition-colors duration-300 relative" style={{ minHeight: 340 }}>
+    <div className="flex-1 flex flex-col w-full transition-colors duration-300" style={{ height: '100%', minHeight: '340px' }}>
       <div 
         ref={scrollContainerRef}
-        className="h-full w-full overflow-y-scroll custom-scrollbar"
+        className="flex-1 overflow-y-auto custom-scrollbar"
         onScroll={handleScroll}
+        style={{ height: '100%' }}
       >
-        <div className="px-12 pt-6 pb-4 pr-8">
+        <div className="px-12 pt-6 pb-4 pr-8 min-h-full">
           <div className="w-full max-w-5xl mx-auto">
             {messages.map((msg, i) => (
               <ChatBubble
