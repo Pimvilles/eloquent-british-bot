@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect } from "react";
 import ChatBubble from "./ChatBubble";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 interface Message {
   text: string;
@@ -22,6 +23,7 @@ const MessageList: React.FC<MessageListProps> = ({
   onPlayMessage 
 }) => {
   const messageListRef = useRef<HTMLDivElement>(null);
+  const { isDarkMode } = useDarkMode();
 
   useEffect(() => {
     if (messageListRef.current)
@@ -30,7 +32,7 @@ const MessageList: React.FC<MessageListProps> = ({
 
   return (
     <div
-      className="flex-1 w-full overflow-y-auto px-12 pt-6 pb-4"
+      className={`flex-1 w-full overflow-y-auto px-12 pt-6 pb-4 transition-colors duration-300`}
       ref={messageListRef}
       style={{ minHeight: 340 }}
     >

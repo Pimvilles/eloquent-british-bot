@@ -6,12 +6,14 @@ import MessageInputRow from "./MessageInputRow";
 import BrandFooter from "./BrandFooter";
 import { speakWithBrowser } from "@/lib/speech";
 import { useChat } from "@/hooks/useChat";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 const USER_NAME = "Mr Moloto";
 
 const Chatbot = () => {
   const [input, setInput] = useState("");
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
+  const { isDarkMode } = useDarkMode();
   
   const { messages, isProcessing, sendMessage, handleClearHistory } = useChat();
 
@@ -36,7 +38,11 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between min-h-[95vh] w-full bg-[#171c23] mx-auto rounded-2xl shadow-2xl">
+    <div className={`flex flex-col justify-between min-h-[95vh] w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-[#171c23] text-white' 
+        : 'bg-white text-gray-900'
+    }`}>
       <TopBar 
         userName={USER_NAME}
         messageCount={messages.length}
