@@ -47,10 +47,6 @@ const MessageList: React.FC<MessageListProps> = ({
         ref={scrollContainerRef}
         className="h-full w-full overflow-y-scroll custom-scrollbar"
         onScroll={handleScroll}
-        style={{
-          scrollbarWidth: 'thick',
-          scrollbarColor: isDarkMode ? '#718096 rgba(255, 255, 255, 0.1)' : '#4a5568 rgba(0, 0, 0, 0.1)'
-        }}
       >
         <div className="px-12 pt-6 pb-4 pr-8">
           <div className="w-full max-w-5xl mx-auto">
