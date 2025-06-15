@@ -4,6 +4,7 @@ import { useSpeechToText } from "@/lib/speech";
 import { validateFile, processFile, ProcessedFile } from "@/lib/fileUtils";
 import FilePreview from "./FilePreview";
 import { useToast } from "@/hooks/use-toast";
+
 interface Props {
   value: string;
   onChange: (v: string) => void;
@@ -11,6 +12,7 @@ interface Props {
   onSpeechResult: (txt: string) => void;
   onFilesSelected?: (files: ProcessedFile[]) => void;
 }
+
 const MessageInputRow: React.FC<Props> = ({
   value,
   onChange,
@@ -101,41 +103,83 @@ const MessageInputRow: React.FC<Props> = ({
       setSelectedFiles([]);
     }
   };
-  return <div className="px-0">
+  return (
+    <div className="w-full">
       {/* File previews */}
-      {selectedFiles.length > 0 && <div className="px-6 py-3 bg-[#171c23] border-t border-[#2a2f3a]">
+      {selectedFiles.length > 0 && (
+        <div className="px-4 py-3 bg-[#171c23] border-t border-[#2a2f3a]">
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-            {selectedFiles.map((file, index) => <FilePreview key={index} file={file} onRemove={() => removeFile(index)} />)}
+            {selectedFiles.map((file, index) => (
+              <FilePreview key={index} file={file} onRemove={() => removeFile(index)} />
+            ))}
           </div>
-        </div>}
+        </div>
+      )}
       
       {/* Input row */}
-      <div className="flex items-center gap-3 w-full bg-[#1a1f29] rounded-b-2xl py-[5px] px-0 mx-0 my-0">
+      <div className="flex items-center gap-2 w-full bg-[#1a1f29] rounded-b-2xl py-[5px] px-4">
         {/* Files Upload Button */}
-        <button title="Upload files or take photo" onClick={handleFileUpload} type="button" className="flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg bg-[#212635] hover:bg-[#2a2f3a] transition py-0 px-0 mx-0 my-0 text-white">
+        <button 
+          title="Upload files or take photo" 
+          onClick={handleFileUpload} 
+          type="button" 
+          className="flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg bg-[#212635] hover:bg-[#2a2f3a] transition text-white"
+        >
           <Files size={20} />
         </button>
         
         {/* Hidden file input */}
-        <input ref={fileInputRef} type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.csv,.json" capture="environment" onChange={handleFileChange} className="hidden" multiple />
+        <input 
+          ref={fileInputRef} 
+          type="file" 
+          accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.csv,.json" 
+          capture="environment" 
+          onChange={handleFileChange} 
+          className="hidden" 
+          multiple 
+        />
 
-        <input ref={inputRef} value={value} onChange={e => onChange(e.target.value)} onKeyDown={e => {
-        if (e.key === "Enter" && (value.trim() || selectedFiles.length > 0)) {
-          handleSend();
-        }
-      }} placeholder="Enter a prompt here" style={{
-        minHeight: 44,
-        maxHeight: 80
-      }} className="flex-1 bg-[#232937] text-white rounded-xl border-none outline-none placeholder-gray-400 text-base py-[11px] px-[11px]" />
-        <button title="Mic" className={`h-11 w-11 flex items-center justify-center rounded-lg ${listening ? "bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} transition text-white`} onClick={startMic} disabled={listening} type="button">
-          <Mic size={24} />
+        <input 
+          ref={inputRef} 
+          value={value} 
+          onChange={e => onChange(e.target.value)} 
+          onKeyDown={e => {
+            if (e.key === "Enter" && (value.trim() || selectedFiles.length > 0)) {
+              handleSend();
+            }
+          }} 
+          placeholder="Enter a prompt here" 
+          style={{
+            minHeight: 44,
+            maxHeight: 80
+          }} 
+          className="flex-1 min-w-0 bg-[#232937] text-white rounded-xl border-none outline-none placeholder-gray-400 text-base py-[11px] px-[11px]" 
+        />
+        
+        <button 
+          title="Mic" 
+          className={`flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg ${listening ? "bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} transition text-white`} 
+          onClick={startMic} 
+          disabled={listening} 
+          type="button"
+        >
+          <Mic size={20} />
         </button>
-        <button title="Send" className={`h-11 w-11 flex items-center justify-center rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 transition text-white`} onClick={handleSend} disabled={!value.trim() && selectedFiles.length === 0} type="button">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="px-0">
+        
+        <button 
+          title="Send" 
+          className="flex-shrink-0 h-11 w-11 flex items-center justify-center rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 transition text-white" 
+          onClick={handleSend} 
+          disabled={!value.trim() && selectedFiles.length === 0} 
+          type="button"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M3 20v-6l16-2-16-2V4l19 8-19 8Z" fill="currentColor" />
           </svg>
         </button>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default MessageInputRow;
