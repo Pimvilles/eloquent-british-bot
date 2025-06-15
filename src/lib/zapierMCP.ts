@@ -26,21 +26,31 @@ export function connectZapierMCP(
   const url = new URL(sseUrl);
   url.searchParams.set("message", prompt);
 
+  console.log("[MCP] Connecting to", url.toString());
+
   const source = new EventSource(url.toString(), { withCredentials: false });
 
+  source.onopen = () => {
+    console.log("[MCP] SSE connection open");
+  };
   source.onmessage = (event) => {
+    console.log("[MCP] SSE message received", event.data);
     try {
       const json: ToolResult = JSON.parse(event.data);
       onResult(json);
-    } catch {
+    } catch (err) {
       // fallback: raw text
       onResult({ message: event.data });
     }
   };
   source.onerror = (event) => {
+    console.error("[MCP] SSE error", event);
     source.close();
     onResult({ message: "Sorry, there was a problem with the tool connection.", isFinal: true });
   };
   // Return a disconnect/cleanup function
-  return () => source.close();
+  return () => {
+    console.log("[MCP] SSE connection closed");
+    source.close();
+  };
 }
