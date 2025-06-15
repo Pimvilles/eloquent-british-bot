@@ -1,4 +1,5 @@
 
+
 /* Custom scrollbar styles for MessageList */
 
 /* WebKit browsers (Chrome, Safari, Edge) */
@@ -57,3 +58,4 @@
 .dark .custom-scrollbar {
   scrollbar-color: #718096 rgba(255, 255, 255, 0.1);
 }
+
