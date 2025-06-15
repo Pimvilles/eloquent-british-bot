@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
-import { loadConversation, saveConversation, clearConversation } from "@/lib/memory";
+import { loadConversation, saveConversation, clearConversation, saveChatToHistory, loadChatHistory } from "@/lib/memory";
 
 interface Message {
   text: string;
@@ -63,6 +63,21 @@ export const useChat = () => {
   }, [messages]);
 
   const handleClearHistory = () => {
+    clearConversation();
+    setMessages([{
+      text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
+      sender: "bot",
+      time: getNow(),
+    }]);
+  };
+
+  const handleNewChat = () => {
+    // Save current conversation to history if it has meaningful content
+    if (messages.length > 1) {
+      saveChatToHistory(messages);
+    }
+    
+    // Clear current conversation and start fresh
     clearConversation();
     setMessages([{
       text: "Yebo Mr Moloto! Ghost here. Ready to execute. What's the next task?",
@@ -169,6 +184,7 @@ export const useChat = () => {
     isProcessing,
     sendMessage,
     handleClearHistory,
+    handleNewChat,
     loadMessageContext,
   };
 };

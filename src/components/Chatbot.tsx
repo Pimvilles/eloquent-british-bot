@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import TopBar from "./TopBar";
 import MessageList from "./MessageList";
@@ -20,7 +19,7 @@ const Chatbot = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isDarkMode } = useDarkMode();
   
-  const { messages, isProcessing, sendMessage, handleClearHistory, loadMessageContext } = useChat();
+  const { messages, isProcessing, sendMessage, handleClearHistory, handleNewChat, loadMessageContext } = useChat();
 
   const handleSend = async () => {
     const question = input.trim();
@@ -98,6 +97,7 @@ const Chatbot = () => {
           userName={USER_NAME}
           messageCount={messages.length}
           onClearHistory={handleClearHistory}
+          onNewChat={handleNewChat}
           onVoiceCall={handleVoiceCall}
           onOpenSidebar={handleOpenSidebar}
         />

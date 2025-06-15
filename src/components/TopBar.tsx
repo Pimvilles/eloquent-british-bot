@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Menu, Settings, Moon, Sun, History, Trash2 } from "lucide-react";
+import { Menu, Settings, Moon, Sun, History, Trash2, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ interface TopBarProps {
   onClearHistory: () => void;
   onVoiceCall?: () => void;
   onOpenSidebar: () => void;
+  onNewChat: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({ 
@@ -26,7 +27,8 @@ const TopBar: React.FC<TopBarProps> = ({
   messageCount, 
   onClearHistory, 
   onVoiceCall,
-  onOpenSidebar
+  onOpenSidebar,
+  onNewChat
 }) => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
@@ -36,7 +38,7 @@ const TopBar: React.FC<TopBarProps> = ({
         ? 'border-b border-[#232938]' 
         : 'border-b border-gray-200'
     }`}>
-      {/* Hamburger Menu */}
+      {/* Hamburger Menu and New Chat */}
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
@@ -47,6 +49,18 @@ const TopBar: React.FC<TopBarProps> = ({
           onClick={onOpenSidebar}
         >
           <Menu className="h-6 w-6" />
+        </Button>
+
+        {/* New Chat Button */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`text-green-500 transition-colors duration-300 ${
+            isDarkMode ? 'hover:bg-[#232938]' : 'hover:bg-gray-100'
+          }`}
+          onClick={onNewChat}
+        >
+          <Pencil className="h-6 w-6" />
         </Button>
 
         {/* Settings Dropdown */}
