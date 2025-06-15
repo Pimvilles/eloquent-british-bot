@@ -126,7 +126,7 @@ const MessageInputRow: React.FC<Props> = ({
       }} placeholder="Enter a prompt here" style={{
         minHeight: 44,
         maxHeight: 80
-      }} className="flex-1 bg-[#232937] text-white rounded-xl border-none outline-none placeholder-gray-400 text-base px-[10px] py-[10px]" />
+      }} className="flex-1 bg-[#232937] text-white rounded-xl border-none outline-none placeholder-gray-400 text-base py-[11px] px-[11px]" />
         <button title="Mic" className={`h-11 w-11 flex items-center justify-center rounded-lg ${listening ? "bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} transition text-white`} onClick={startMic} disabled={listening} type="button">
           <Mic size={24} />
         </button>
