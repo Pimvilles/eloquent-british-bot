@@ -1,15 +1,16 @@
 
 const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
 
-export const sendToWebhook = async (message: string, sender: "user" | "bot") => {
+export const sendToWebhook = async (message: string, sender: "user" | "bot"): Promise<string | null> => {
   try {
     console.log("Sending to webhook:", { message, sender });
-    await fetch(WEBHOOK_URL, {
+    
+    // Try without no-cors first to get the response
+    const response = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      mode: "no-cors", // This handles CORS issues but won't give response details
       body: JSON.stringify({
         message,
         sender,
@@ -17,9 +18,42 @@ export const sendToWebhook = async (message: string, sender: "user" | "bot") => 
         from: "Melsi Chatbot",
       }),
     });
-    console.log("Webhook request sent successfully");
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Webhook response:", data);
+      
+      // Extract the AI response from the expected format
+      if (data && data.output) {
+        return data.output;
+      }
+    }
+    
+    console.log("Webhook request sent successfully but no valid response");
+    return null;
   } catch (error) {
     console.error("Error sending to webhook:", error);
-    // Don't throw the error to avoid breaking the chat flow
+    
+    // Fallback: try with no-cors mode for at least sending the data
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          message,
+          sender,
+          timestamp: new Date().toISOString(),
+          from: "Melsi Chatbot",
+        }),
+      });
+      console.log("Webhook request sent with no-cors mode");
+    } catch (fallbackError) {
+      console.error("Fallback webhook also failed:", fallbackError);
+    }
+    
+    return null;
   }
 };

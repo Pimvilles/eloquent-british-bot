@@ -44,12 +44,11 @@ export const useChat = () => {
     const userMessage = { text: question, sender: "user" as const, time: getNow() };
     setMessages((prev) => [...prev, userMessage]);
     
-    // Send user message to webhook
-    await sendToWebhook(question, "user");
-
     setIsProcessing(true);
 
     let botMsg = "";
+    let mcpFailed = false;
+    
     setMessages((prev) => [
       ...prev,
       { text: "Melsi is thinking...", sender: "bot" as const, time: getNow() },
@@ -61,7 +60,24 @@ export const useChat = () => {
       );
     };
 
-    console.log("[Chat] Connecting to MCP SSE with prompt...");
+    // Try webhook first for user messages
+    const webhookResponse = await sendToWebhook(question, "user");
+    
+    if (webhookResponse) {
+      // If webhook returns a response, use it directly
+      setIsProcessing(false);
+      removeThinking();
+      setMessages((prev) => [
+        ...prev,
+        { text: webhookResponse, sender: "bot" as const, time: getNow() },
+      ]);
+      // Send bot response to webhook for logging
+      await sendToWebhook(webhookResponse, "bot");
+      return;
+    }
+
+    // Fallback to MCP if webhook doesn't return a response
+    console.log("[Chat] Webhook didn't return response, trying MCP SSE...");
     connectZapierMCP(
       ZAPIER_MCP_SSE,
       `[SYSTEM INSTRUCTIONS]\n${SYSTEM_PROMPT}\n\n[CHAT CONTEXT]\n${getContext(messages)}\n\n[REQUEST]\n${question}`,
@@ -79,10 +95,17 @@ export const useChat = () => {
             console.log("[Chat] Added final bot reply:", finalResponse);
             // Send final bot response to webhook
             sendToWebhook(finalResponse, "bot");
+          } else if (mcpFailed) {
+            // If MCP failed and we have no response, show fallback
+            const fallbackResponse = "Sorry, I'm having trouble connecting to my tools right now. Please try again in a moment.";
+            setMessages((prev) => [
+              ...prev,
+              { text: fallbackResponse, sender: "bot" as const, time: getNow() },
+            ]);
+            sendToWebhook(fallbackResponse, "bot");
           }
         } else if (data.message) {
           botMsg += data.message;
-          // Faster message updates - reduced throttling
           setMessages((prev) => {
             if (
               prev.length > 0 &&
@@ -97,6 +120,8 @@ export const useChat = () => {
             }
             return prev;
           });
+        } else if (data.message === "Sorry, there was a problem with the tool connection.") {
+          mcpFailed = true;
         }
       }
     );
