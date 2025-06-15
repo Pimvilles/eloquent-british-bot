@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
 import { loadConversation, saveConversation, clearConversation, saveChatToHistory, loadChatHistory } from "@/lib/memory";
@@ -123,40 +124,6 @@ export const useChat = () => {
     
     // Send user message to webhook
     await sendToWebhook(question, "user");
-    
-    // Handle greetings locally with faster response
-    const greetings = [
-      "hello", "hi", "hey", "howzit", "good morning", 
-      "good afternoon", "good evening", "yebo",
-    ];
-    const cleaned = question.toLowerCase().replace(/[^a-z\s]/g, "");
-
-    if (
-      greetings.some((g) =>
-        cleaned === g ||
-        cleaned.startsWith(g + " ") ||
-        cleaned.endsWith(" " + g) ||
-        cleaned.includes(" " + g + " ")
-      )
-    ) {
-      setIsProcessing(false);
-      const greetingResponse = "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?";
-      
-      // Faster greeting response - no delay
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: greetingResponse,
-            sender: "bot" as const,
-            time: getNow(),
-          },
-        ]);
-        // Send greeting response to webhook
-        sendToWebhook(greetingResponse, "bot");
-      }, 100);
-      return;
-    }
 
     setIsProcessing(true);
 
@@ -222,3 +189,4 @@ export const useChat = () => {
     loadMessageContext,
   };
 };
+
