@@ -1,81 +1,11 @@
 
-
 import { useState, useEffect } from "react";
 import { connectZapierMCP } from "@/lib/zapierMCP";
-import { loadConversation, saveConversation, clearConversation, saveChatToHistory, loadChatHistory } from "@/lib/memory";
-
-interface Message {
-  text: string;
-  sender: "user" | "bot";
-  time: string;
-}
-
-const ZAPIER_MCP_SSE =
-  "https://mcp.zapier.com/api/mcp/s/OTNjMDc2MmEtZGIzNC00N2YwLTkyYTQtM2U3NTViMTQ4ZDc3OjdmZmZkNmFkLWJhZTMtNDgzYy1iNDgxLTIyZDk1ZThhYzE2Nw==/sse";
-
-const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
-
-const SYSTEM_PROMPT = `You are Melsi—a sharp, witty, British-born, Mzansi-raised AI assistant. Your top priority is to complete tasks and deliver results efficiently for Mr Kwena Moloto, CEO of Kwena Moloto A.I Solutions in Johannesburg, South Africa.
-
-You have full access to business and productivity tools via Zapier MCP. For any actionable request, you must immediately analyse which tool to use and call that tool to perform the task. Do not just describe what you could do—**always act and deliver real results**. Only ask for confirmation if absolutely necessary, and then act without further back-and-forth.
-
-You have access to the following tools:
-
-- Zapier MCP: Use this for business automation and connected task execution (Gmail, Calendar, Notion, etc.)
-- Tavily Search: Use this to search the internet and retrieve real-time, up-to-date information.
-- Google Gemini: Use this for advanced language processing or when deep thinking is needed.
-- Calculator: Use for any math, finance, or formula tasks.
-- Maps (Google Places): Use to look up businesses, places, contact info, and reviews.
-- Web Crawler: Use this to extract full website content or scan site info.
-- HTTP Request Tool: Use to call any public API.
-
-Rules:
-- Focus on executing tasks and returning actionable results, not on extended conversation.
-- Ask questions only if absolutely necessary.
-- General knowledge, facts, or witty remarks should be rare—only if they don't distract from the task.
-- Be concise and businesslike, but still polite and respectful.
-- Only tease or joke if Mr Moloto invites it.
-- Always address him as "Mr Moloto".
-
-Whenever a task is requested, quickly determine which tool is best and use it.
-
-If a task cannot be performed with the available tools, briefly inform Mr Moloto and suggest a practical alternative.
-`;
-
-function getNow() {
-  const date = new Date();
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function getContext(messages: Message[]) {
-  return messages
-    .slice(-10)
-    .map(
-      (msg) =>
-        `[${msg.sender === "user" ? "Mr Moloto" : "Melsi"}] ${msg.text}`
-    )
-    .join("\n");
-}
-
-const sendToWebhook = async (message: string, sender: "user" | "bot") => {
-  try {
-    console.log("Sending to webhook:", { message, sender });
-    await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message,
-        sender,
-        timestamp: new Date().toISOString(),
-        from: "Melsi Chatbot",
-      }),
-    });
-  } catch (error) {
-    console.error("Error sending to webhook:", error);
-  }
-};
+import { loadConversation, saveConversation, clearConversation, saveChatToHistory } from "@/lib/memory";
+import { Message } from "@/types/chat";
+import { sendToWebhook } from "@/services/webhookService";
+import { getNow, getContext, createInitialMessage } from "@/utils/chatUtils";
+import { SYSTEM_PROMPT, ZAPIER_MCP_SSE } from "@/config/systemPrompt";
 
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>(() => loadConversation());
@@ -87,11 +17,7 @@ export const useChat = () => {
 
   const handleClearHistory = () => {
     clearConversation();
-    setMessages([{
-      text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
-      sender: "bot",
-      time: getNow(),
-    }]);
+    setMessages([createInitialMessage()]);
   };
 
   const handleNewChat = () => {
@@ -102,11 +28,7 @@ export const useChat = () => {
     
     // Clear current conversation and start fresh
     clearConversation();
-    setMessages([{
-      text: "Yebo Mr Moloto! Melsi here. Ready to execute. What's the next task?",
-      sender: "bot",
-      time: getNow(),
-    }]);
+    setMessages([createInitialMessage()]);
   };
 
   const loadMessageContext = (clickedMessage: Message, messageIndex: number) => {
@@ -189,4 +111,3 @@ export const useChat = () => {
     loadMessageContext,
   };
 };
-
