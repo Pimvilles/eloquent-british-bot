@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import TopBar from "./TopBar";
 import MessageList from "./MessageList";
@@ -95,44 +96,52 @@ const Chatbot = () => {
   return (
     <>
       <PWAInstallPrompt />
-      <div className={`flex flex-col justify-between min-h-[95vh] w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 ${
+      <div className={`flex flex-col h-full w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 mobile-viewport-fix ${
         isDarkMode 
           ? 'bg-[#171c23] text-white' 
           : 'bg-white text-gray-900'
       }`}>
-        <TopBar 
-          userName={USER_NAME}
-          messageCount={messages.length}
-          onClearHistory={handleClearHistory}
-          onNewChat={handleNewChat}
-          onVoiceCall={handleVoiceCall}
-          onOpenSidebar={handleOpenSidebar}
-        />
-        
-        <MessageList
-          messages={messages}
-          isProcessing={isProcessing}
-          ttsMessageIdx={ttsMessageIdx}
-          onPlayMessage={handlePlayMessage}
-        />
-        
-        <div className="px-0">
-          <MessageInputRow
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            onSpeechResult={handleSpeechToTextResult}
-            onFilesSelected={handleFilesSelected}
+        <div className="flex-shrink-0">
+          <TopBar 
+            userName={USER_NAME}
+            messageCount={messages.length}
+            onClearHistory={handleClearHistory}
+            onNewChat={handleNewChat}
+            onVoiceCall={handleVoiceCall}
+            onOpenSidebar={handleOpenSidebar}
           />
         </div>
         
-        {isProcessing && (
-          <div className="w-full flex justify-center py-3 text-blue-400 animate-pulse">
-            <span>Melsi is executing your request...</span>
-          </div>
-        )}
+        <div className="flex-1 overflow-hidden">
+          <MessageList
+            messages={messages}
+            isProcessing={isProcessing}
+            ttsMessageIdx={ttsMessageIdx}
+            onPlayMessage={handlePlayMessage}
+          />
+        </div>
         
-        <BrandFooter />
+        <div className="flex-shrink-0">
+          <div className="px-0">
+            <MessageInputRow
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              onSpeechResult={handleSpeechToTextResult}
+              onFilesSelected={handleFilesSelected}
+            />
+          </div>
+          
+          {isProcessing && (
+            <div className="w-full flex justify-center py-3 text-blue-400 animate-pulse">
+              <span>Melsi is executing your request...</span>
+            </div>
+          )}
+          
+          <div className="pb-safe">
+            <BrandFooter />
+          </div>
+        </div>
       </div>
 
       <ChatHistorySidebar
