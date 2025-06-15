@@ -96,12 +96,13 @@ const Chatbot = () => {
   return (
     <>
       <PWAInstallPrompt />
-      <div className={`flex flex-col h-full w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 mobile-viewport-fix ${
+      <div className={`flex flex-col h-full w-full mx-auto rounded-2xl shadow-2xl transition-colors duration-300 overflow-hidden ${
         isDarkMode 
           ? 'bg-[#171c23] text-white' 
           : 'bg-white text-gray-900'
       }`}>
-        <div className="flex-shrink-0">
+        {/* Top Bar - Fixed */}
+        <div className="flex-shrink-0 safe-top">
           <TopBar 
             userName={USER_NAME}
             messageCount={messages.length}
@@ -112,6 +113,7 @@ const Chatbot = () => {
           />
         </div>
         
+        {/* Message List - Scrollable */}
         <div className="flex-1 overflow-hidden">
           <MessageList
             messages={messages}
@@ -121,26 +123,23 @@ const Chatbot = () => {
           />
         </div>
         
-        <div className="flex-shrink-0">
-          <div className="px-0">
-            <MessageInputRow
-              value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              onSpeechResult={handleSpeechToTextResult}
-              onFilesSelected={handleFilesSelected}
-            />
-          </div>
+        {/* Bottom Section - Fixed */}
+        <div className="flex-shrink-0 safe-bottom">
+          <MessageInputRow
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            onSpeechResult={handleSpeechToTextResult}
+            onFilesSelected={handleFilesSelected}
+          />
           
           {isProcessing && (
-            <div className="w-full flex justify-center py-3 text-blue-400 animate-pulse">
-              <span>Melsi is executing your request...</span>
+            <div className="w-full flex justify-center py-2 text-blue-400 animate-pulse">
+              <span className="text-sm">Melsi is executing your request...</span>
             </div>
           )}
           
-          <div className="pb-safe">
-            <BrandFooter />
-          </div>
+          <BrandFooter />
         </div>
       </div>
 
