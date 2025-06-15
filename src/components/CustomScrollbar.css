@@ -1,10 +1,7 @@
 
 /* Custom scrollbar styles for MessageList */
-.custom-scrollbar {
-  /* WebKit browsers (Chrome, Safari, Edge) */
-  scrollbar-width: thick;
-}
 
+/* WebKit browsers (Chrome, Safari, Edge) */
 .custom-scrollbar::-webkit-scrollbar {
   width: 16px;
   background-color: transparent;
@@ -34,7 +31,7 @@
   background-clip: content-box;
 }
 
-/* Dark mode styles */
+/* Dark mode styles for WebKit */
 .dark .custom-scrollbar::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
 }
