@@ -1,13 +1,46 @@
-
 import React, { useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
 import MessageInputRow from "./MessageInputRow";
 import AvatarLogo from "./AvatarLogo";
 import BrandFooter from "./BrandFooter";
 import { speakWithElevenLabs } from "@/lib/speech";
+import { connectZapierMCP } from "@/lib/zapierMCP";
+import { loadConversation, saveConversation, MemoryMessage } from "@/lib/memory";
 
-const BOT_NAME = "Jarvus";
+const BOT_NAME = "Ghost";
 const USER_NAME = "Mr Moloto";
+
+// Zapier MCP SSE endpoint from user
+const ZAPIER_MCP_SSE =
+  "https://mcp.zapier.com/api/mcp/s/OTNjMDc2MmEtZGIzNC00N2YwLTkyYTQtM2U3NTViMTQ4ZDc3OjdmZmZkNmFkLWJhZTMtNDgzYy1iNDgxLTIyZDk1ZThhYzE2Nw==/sse";
+
+// Ghost system prompt (given by user)
+const SYSTEM_PROMPT = `You are Ghost—a sharp, witty, British-born, Mzansi-raised AI assistant. Your top priority is to complete tasks and deliver results efficiently for Mr Kwena Moloto, CEO of Kwena Moloto A.I Solutions in Johannesburg, South Africa.
+
+You have full access to business and productivity tools via Zapier MCP. For any actionable request, you must immediately analyse which tool to use and call that tool to perform the task. Do not just describe what you could do—**always act and deliver real results**. Only ask for confirmation if absolutely necessary, and then act without further back-and-forth.
+
+You have access to the following tools:
+
+- Zapier MCP: Use this for business automation and connected task execution (Gmail, Calendar, Notion, etc.)
+- Tavily Search: Use this to search the internet and retrieve real-time, up-to-date information.
+- Google Gemini: Use this for advanced language processing or when deep thinking is needed.
+- Calculator: Use for any math, finance, or formula tasks.
+- Maps (Google Places): Use to look up businesses, places, contact info, and reviews.
+- Web Crawler: Use this to extract full website content or scan site info.
+- HTTP Request Tool: Use to call any public API.
+
+Rules:
+- Focus on executing tasks and returning actionable results, not on extended conversation.
+- Ask questions only if absolutely necessary.
+- General knowledge, facts, or witty remarks should be rare—only if they don’t distract from the task.
+- Be concise and businesslike, but still polite and respectful.
+- Only tease or joke if Mr Moloto invites it.
+- Always address him as “Mr Moloto”.
+
+Whenever a task is requested, quickly determine which tool is best and use it.
+
+If a task cannot be performed with the available tools, briefly inform Mr Moloto and suggest a practical alternative.
+`;
 
 interface Message {
   text: string;
@@ -15,22 +48,20 @@ interface Message {
   time: string;
 }
 
-const WEBHOOK_URL = "http://localhost:5678/webhook-test/3588d4a3-11a8-4a88-9e4b-5142113c5d06";
-
 const Chatbot = () => {
-  // Store chat messages
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      text: `Yebo Mr Moloto! Jarvus here, ready to assist you today, Boss! What can I help you with?`,
-      sender: "bot",
-      time: getNow(),
-    },
-  ]);
+  // Message state and TTS
+  const [messages, setMessages] = useState<Message[]>(() => loadConversation());
   const [input, setInput] = useState("");
-  // TTS
   const [ttsMessageIdx, setTtsMessageIdx] = useState<number | null>(null);
   const [ttsApiKey, setTtsApiKey] = useState<string>("");
   const [isTTSModal, setIsTTSModal] = useState(false);
+  // Tool/stream state
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Save messages to memory each change
+  React.useEffect(() => {
+    saveConversation(messages);
+  }, [messages]);
 
   // Handle user send
   async function sendMessage() {
@@ -41,31 +72,57 @@ const Chatbot = () => {
       ...prev,
       { text: question, sender: "user", time: getNow() },
     ]);
-    // Optimistic UI - then fetch
-    try {
-      const res = await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: question }),
-      });
-      const data = await res.json();
-      if (data?.response) {
-        setMessages((prev) => [
-          ...prev,
-          { text: data.response, sender: "bot", time: getNow() },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { text: "Sorry, there was an error with the bot response.", sender: "bot", time: getNow() },
-        ]);
+    setIsProcessing(true);
+
+    // Run via Zapier MCP SSE streaming
+    let botMsg = ""; // response will be streamed
+    setMessages((prev) => [
+      ...prev,
+      { text: "Ghost is thinking...", sender: "bot", time: getNow() },
+    ]);
+    // Remove the loading message later
+    const removeThinking = () => {
+      setMessages((prev) =>
+        prev.filter((m) => m.text !== "Ghost is thinking...")
+      );
+    };
+
+    const disconnect = connectZapierMCP(
+      ZAPIER_MCP_SSE,
+      // system prompt + user message for context
+      `[SYSTEM INSTRUCTIONS]\n${SYSTEM_PROMPT}\n\n[CHAT CONTEXT]\n${getContext(messages)}\n\n[REQUEST]\n${question}`,
+      (data) => {
+        if (data.isFinal) {
+          setIsProcessing(false);
+          removeThinking();
+          if (botMsg.trim()) {
+            setMessages((prev) => [
+              ...prev,
+              { text: botMsg.trim(), sender: "bot", time: getNow() },
+            ]);
+          }
+        } else if (data.message) {
+          // Stream content into the last bot message
+          botMsg += data.message;
+          setMessages((prev) => {
+            // replace last message if still "Ghost is thinking..."
+            if (
+              prev.length > 0 &&
+              prev[prev.length - 1].text === "Ghost is thinking..."
+            ) {
+              return [
+                ...prev.slice(0, -1),
+                { text: botMsg, sender: "bot", time: getNow() },
+              ];
+            }
+            return prev;
+          });
+        }
       }
-    } catch (e) {
-      setMessages((prev) => [
-        ...prev,
-        { text: "Sorry, failed to contact the AI server.", sender: "bot", time: getNow() },
-      ]);
-    }
+    );
+
+    // Optional: cancel stream on unmount
+    // (We'll keep code simple for now)
   }
 
   // Play message as speech
@@ -125,7 +182,7 @@ const Chatbot = () => {
   React.useEffect(() => {
     if (messageListRef.current)
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
-  }, [messages.length]);
+  }, [messages.length, isProcessing]);
 
   return (
     <div className="flex flex-col justify-between min-h-[95vh] w-full bg-[#171c23] mx-auto rounded-2xl shadow-2xl">
@@ -172,6 +229,11 @@ const Chatbot = () => {
           onSpeechResult={handleSpeechToTextResult}
         />
       </div>
+      {isProcessing && (
+        <div className="w-full flex justify-center py-3 text-blue-400 animate-pulse">
+          <span>Ghost is executing your request...</span>
+        </div>
+      )}
       <BrandFooter />
       {isTTSModal && renderTTSModal()}
     </div>
@@ -181,6 +243,17 @@ const Chatbot = () => {
 function getNow() {
   const date = new Date();
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// Returns last 10 exchanges for context
+function getContext(messages: MemoryMessage[]) {
+  return messages
+    .slice(-10)
+    .map(
+      (msg) =>
+        `[${msg.sender === "user" ? "Mr Moloto" : "Ghost"}] ${msg.text}`
+    )
+    .join("\n");
 }
 
 export default Chatbot;
